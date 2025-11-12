@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { PulsefiLogo } from '../../components/LoadingScreen';
 
 const SMEDashboardPage = ({ smeData }) => {
   const [dashboardData, setDashboardData] = useState({
@@ -333,13 +334,12 @@ const SMEDashboardPage = ({ smeData }) => {
         <div className="max-w-6xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <motion.img
-                src="/src/pulsi-logo-removebg-preview.png"
-                alt="PulseFi Logo"
-                className="h-12 w-12"
+              <motion.div
                 animate={{ rotate: [0, 5, -5, 0] }}
                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-              />
+              >
+                <PulsefiLogo size={48} />
+              </motion.div>
               <div>
                 <h1 className="text-xl font-bold text-pulse-navy dark:text-white">
                   SME Dashboard

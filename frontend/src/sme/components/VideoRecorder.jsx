@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import LoadingScreen from '../../components/LoadingScreen';
 
 const VideoRecorder = ({ data, onComplete, onBack, canGoBack }) => {
   const [isRecording, setIsRecording] = useState(false);
@@ -109,13 +110,22 @@ const VideoRecorder = ({ data, onComplete, onBack, canGoBack }) => {
       return;
     }
 
-    onComplete({ 
-      videoData: {
-        blob: recordedVideo.blob,
-        duration: recordingTime,
-        timestamp: new Date().toISOString()
-      }
-    });
+    // Show processing state briefly
+    setError('');
+    const processingDiv = document.createElement('div');
+    processingDiv.innerHTML = '<div class="fixed inset-0 z-50 bg-white/80 backdrop-blur-sm flex items-center justify-center"><div class="text-center"><div class="w-8 h-8 border-3 border-pulse-cyan border-t-transparent rounded-full animate-spin mx-auto mb-4"></div><p class="text-gray-600">Processing video...</p></div></div>';
+    document.body.appendChild(processingDiv);
+    
+    setTimeout(() => {
+      document.body.removeChild(processingDiv);
+      onComplete({ 
+        videoData: {
+          blob: recordedVideo.blob,
+          duration: recordingTime,
+          timestamp: new Date().toISOString()
+        }
+      });
+    }, 1500);
   };
 
   const formatTime = (seconds) => {
