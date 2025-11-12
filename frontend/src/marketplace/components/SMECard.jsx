@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 
-const SMECard = ({ sme, onViewDetails }) => {
+const SMECard = ({ sme, onViewDetails, viewMode = 'grid' }) => {
   const [isHovered, setIsHovered] = useState(false);
   const {
     id,
@@ -11,12 +11,72 @@ const SMECard = ({ sme, onViewDetails }) => {
     image,
     pulseScore,
     profitScore,
+    loanAmount = 2500000,
     isVerified = true
   } = sme;
 
   const handleViewDetails = () => {
     onViewDetails?.(sme);
   };
+
+  if (viewMode === 'list') {
+    return (
+      <motion.div
+        className="bg-white dark:bg-pulse-navy rounded-xl shadow-soft border border-gray-100 dark:border-gray-800 overflow-hidden cursor-pointer group p-6"
+        whileHover={{ 
+          x: 4,
+          boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)"
+        }}
+        whileTap={{ scale: 0.99 }}
+        transition={{ duration: 0.2 }}
+        onClick={handleViewDetails}
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-6 flex-1">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-pulse-light dark:bg-gray-700 rounded-lg flex items-center justify-center overflow-hidden">
+                {image ? (
+                  <img src={image} alt={name} className="w-full h-full object-cover" />
+                ) : (
+                  <span className="material-symbols-outlined text-gray-400">business</span>
+                )}
+              </div>
+              <div>
+                <h3 className="font-bold text-pulse-dark dark:text-white text-lg">{name}</h3>
+                <p className="text-gray-600 dark:text-gray-400 text-sm">{industry} • {location}</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-6">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-pulse-cyan">{pulseScore}</div>
+                <div className="text-xs text-gray-500">Pulse Score</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-pulse-pink">{profitScore}</div>
+                <div className="text-xs text-gray-500">Profit Score</div>
+              </div>
+            </div>
+            
+            <div className="text-center">
+              <div className="text-xl font-bold text-pulse-dark dark:text-white">
+                ₦{loanAmount.toLocaleString()}
+              </div>
+              <div className="text-xs text-gray-500">Seeking</div>
+            </div>
+          </div>
+          
+          <motion.button
+            className="px-6 py-2 pulse-gradient-bg text-white rounded-lg font-medium opacity-0 group-hover:opacity-100 transition-opacity"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            Analyze Opportunity
+          </motion.button>
+        </div>
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div 
@@ -45,6 +105,12 @@ const SMECard = ({ sme, onViewDetails }) => {
           animate={{ opacity: isHovered ? 1 : 0 }}
           transition={{ duration: 0.3 }}
         />
+        
+        <div className="absolute bottom-2 left-2">
+          <div className="bg-black/70 text-white px-2 py-1 rounded text-xs font-bold">
+            ₦{loanAmount.toLocaleString()}
+          </div>
+        </div>
       </div>
       
       <div className="p-4 flex-grow">
@@ -118,7 +184,7 @@ const SMECard = ({ sme, onViewDetails }) => {
           animate={{ x: isHovered ? 4 : 0 }}
           transition={{ duration: 0.2 }}
         >
-          View Details
+          Analyze Opportunity
         </motion.span>
       </motion.button>
     </motion.div>
