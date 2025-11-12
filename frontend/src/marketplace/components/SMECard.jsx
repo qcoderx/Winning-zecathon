@@ -71,7 +71,7 @@ const SMECard = ({ sme, onViewDetails, viewMode = 'grid' }) => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            Analyze Opportunity
+            View Business Profile
           </motion.button>
         </div>
       </motion.div>
@@ -184,7 +184,7 @@ const SMECard = ({ sme, onViewDetails, viewMode = 'grid' }) => {
           animate={{ x: isHovered ? 4 : 0 }}
           transition={{ duration: 0.2 }}
         >
-          Analyze Opportunity
+          View Business Profile
         </motion.span>
       </motion.button>
     </motion.div>
