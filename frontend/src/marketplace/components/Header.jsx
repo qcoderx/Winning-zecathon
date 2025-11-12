@@ -21,8 +21,7 @@ const Header = ({ onSearch }) => {
     >
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2 text-pulse-navy dark:text-white">
-          <PulsefiLogo size={32} />
-          <h1 className="text-xl font-bold">PulseFi</h1>
+          <PulsefiLogo size={96} />
         </div>
         <div className="hidden md:block h-6 w-px bg-gray-200 dark:bg-gray-700" />
         <h2 className="hidden md:block text-lg font-medium text-gray-600 dark:text-gray-300">Marketplace</h2>

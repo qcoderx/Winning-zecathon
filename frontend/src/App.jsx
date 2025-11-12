@@ -46,6 +46,39 @@ const AuthPageWrapper = () => {
   return <AuthPage />;
 };
 
+function App() {
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsInitialLoading(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
+    <LoadingProvider>
+      <AnimatePresence mode="wait">
+        {isInitialLoading ? (
+          <LoadingScreen 
+            variant="splash"
+            message="Initializing PulseFi..."
+            key="splash"
+          />
+        ) : (
+          <Router key="app">
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/auth" element={<AuthPageWrapper />} />
+              <Route path="/marketplace" element={<MarketplacePage />} />
+              <Route path="/marketplace/profile/:id" element={<SMEProfilePage />} />
+            </Routes>
+          </Router>
+        )}
+      </AnimatePresence>
+    </LoadingProvider>
+  );
+}
 
 export default App;

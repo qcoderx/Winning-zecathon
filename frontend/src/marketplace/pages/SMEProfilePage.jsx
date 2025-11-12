@@ -53,7 +53,7 @@ const SMEProfilePage = () => {
             >
               <span className="material-symbols-outlined">arrow_back</span>
             </motion.button>
-            <PulsefiLogo size={32} />
+            <PulsefiLogo size={64} />
             <h1 className="text-pulse-dark dark:text-white text-xl font-bold">SME Profile</h1>
           </div>
         </div>

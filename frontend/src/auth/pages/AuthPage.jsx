@@ -80,8 +80,7 @@ const AuthPage = () => {
             transition={{ duration: 0.5, delay: 0.1 }}
           >
             <div className="flex items-center gap-3">
-              <PulsefiLogo size={64} />
-              <span className="text-3xl font-bold text-pulse-dark dark:text-white">PulseFi</span>
+              <PulsefiLogo size={128} />
             </div>
           </motion.div>
 

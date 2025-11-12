@@ -18,8 +18,7 @@ const Header = ({ onAuthClick }) => {
               whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.2 }}
             >
-              <PulsefiLogo size={40} />
-              <span className="text-xl font-bold text-pulse-dark dark:text-white">PulseFi</span>
+              <PulsefiLogo size={120} />
             </motion.a>
           </div>
           <div className="flex items-center gap-6">
