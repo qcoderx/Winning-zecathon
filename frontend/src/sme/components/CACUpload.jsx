@@ -225,6 +225,7 @@ const CACUpload = ({ data, onComplete, onBack, canGoBack }) => {
 
         {/* CAC Upload Section - Only show if user has CAC */}
         {hasCAC && (
+          <>
         {/* RC Number Input */}
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -365,6 +366,7 @@ const CACUpload = ({ data, onComplete, onBack, canGoBack }) => {
           )}
         </div>
 
+          </>
         )}
 
         {/* No CAC Notice */}
@@ -382,7 +384,7 @@ const CACUpload = ({ data, onComplete, onBack, canGoBack }) => {
               </div>
             </div>
           </motion.div>
-        )
+        )}
       </div>
 
       <div className="flex justify-between pt-8">

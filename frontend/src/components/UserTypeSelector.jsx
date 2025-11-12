@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { PulsefiLogo } from './LoadingScreen';
 
 const UserTypeSelector = ({ onUserTypeSelect }) => {
   return (
@@ -15,8 +16,11 @@ const UserTypeSelector = ({ onUserTypeSelect }) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
+          <div className="flex justify-center mb-6">
+            <PulsefiLogo size={80} />
+          </div>
           <h1 className="text-3xl font-bold text-pulse-navy dark:text-white mb-4">
-            Welcome to PulseFi
+            Welcome to the Trust Engine
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
             Choose your account type to get started

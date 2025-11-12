@@ -3,6 +3,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSMEProfile } from '../hooks/useMarketplace';
 import { PulsefiLogo } from '../../components/LoadingScreen';
+import InvestmentCard from '../components/InvestmentCard';
+import NegotiationTab from '../components/NegotiationTab';
+import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 
 const SMEProfilePage = () => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -23,15 +26,40 @@ const SMEProfilePage = () => {
     );
   }
 
+  const [offers, setOffers] = useState([]);
+  const [showNegotiation, setShowNegotiation] = useState(false);
+
   const tabs = [
-    { id: 'overview', label: 'Overview' },
-    { id: 'scores', label: 'Scores' },
-    { id: 'charts', label: 'Charts' },
-    { id: 'insights', label: 'AI Insights' }
+    { id: 'overview', label: 'Overview', icon: 'overview' },
+    { id: 'financial', label: 'Financial Health', icon: 'analytics' },
+    { id: 'verification', label: 'Trust Verification', icon: 'verified_user' },
+    { id: 'negotiation', label: 'Make Offer', icon: 'handshake' }
   ];
 
-  const handleInvest = () => {
-    setShowInvestModal(true);
+  // Mock financial data for charts
+  const cashFlowData = [
+    { month: 'Jan', inflow: 450000, outflow: 320000, net: 130000 },
+    { month: 'Feb', inflow: 520000, outflow: 340000, net: 180000 },
+    { month: 'Mar', inflow: 480000, outflow: 360000, net: 120000 },
+    { month: 'Apr', inflow: 610000, outflow: 380000, net: 230000 },
+    { month: 'May', inflow: 580000, outflow: 400000, net: 180000 },
+    { month: 'Jun', inflow: 650000, outflow: 420000, net: 230000 }
+  ];
+
+  const revenueData = [
+    { quarter: 'Q1 2023', revenue: 1450000, growth: 12 },
+    { quarter: 'Q2 2023', revenue: 1680000, growth: 16 },
+    { quarter: 'Q3 2023', revenue: 1820000, growth: 8 },
+    { quarter: 'Q4 2023', revenue: 2100000, growth: 15 }
+  ];
+
+  const handleMakeOffer = () => {
+    setActiveTab('negotiation');
+    setShowNegotiation(true);
+  };
+
+  const handleSubmitOffer = (offer) => {
+    setOffers([...offers, offer]);
   };
 
   const confirmInvestment = () => {
@@ -61,13 +89,13 @@ const SMEProfilePage = () => {
 
       <div className="max-w-7xl mx-auto">
         {/* Company Header */}
-        <div className="p-6 bg-white dark:bg-pulse-navy border-b border-gray-200 dark:border-gray-700">
-          <div className="flex flex-col md:flex-row gap-6">
+        <div className="p-8 bg-gradient-to-r from-white to-pulse-light dark:from-pulse-navy dark:to-pulse-dark border-b border-gray-200 dark:border-gray-700">
+          <div className="flex flex-col lg:flex-row gap-8">
             <div className="flex flex-1 flex-col sm:flex-row gap-6">
               <motion.div 
-                className="bg-pulse-light dark:bg-gray-700 flex items-center justify-center aspect-square rounded-xl h-24 w-24 sm:h-32 sm:w-32 flex-shrink-0 overflow-hidden"
-                whileHover={{ scale: 1.05 }}
-                transition={{ duration: 0.2 }}
+                className="bg-white dark:bg-gray-700 flex items-center justify-center aspect-square rounded-2xl h-32 w-32 flex-shrink-0 overflow-hidden shadow-soft"
+                whileHover={{ scale: 1.05, rotate: 2 }}
+                transition={{ duration: 0.3 }}
               >
                 {sme.image ? (
                   <img src={sme.image} alt={sme.name} className="w-full h-full object-cover" />
@@ -75,57 +103,82 @@ const SMEProfilePage = () => {
                   <span className="material-symbols-outlined text-6xl text-gray-400">business</span>
                 )}
               </motion.div>
-              <div className="flex flex-col justify-center gap-1">
-                <h1 className="text-pulse-dark dark:text-white text-3xl font-bold">{sme.name}</h1>
-                <p className="text-gray-500 dark:text-gray-400 text-base">{sme.industry} | {sme.location}</p>
-                <div className="mt-4 flex items-center gap-2">
+              <div className="flex flex-col justify-center gap-2">
+                <motion.h1 
+                  className="text-pulse-dark dark:text-white text-4xl font-bold"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  {sme.name}
+                </motion.h1>
+                <p className="text-gray-600 dark:text-gray-400 text-lg">{sme.industry} • {sme.location}</p>
+                <div className="mt-4 flex items-center gap-3">
                   <motion.span 
-                    className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20 dark:bg-green-500/10 dark:text-green-400 dark:ring-green-500/20"
+                    className="inline-flex items-center rounded-full bg-green-100 dark:bg-green-900/30 px-3 py-1 text-sm font-medium text-green-800 dark:text-green-200 ring-1 ring-green-600/20"
                     whileHover={{ scale: 1.05 }}
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.4 }}
                   >
-                    Verified
+                    <span className="material-symbols-outlined text-sm mr-1">verified</span>
+                    Verified Business
                   </motion.span>
                   <motion.span 
-                    className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10 dark:bg-blue-500/10 dark:text-blue-400 dark:ring-blue-500/20"
+                    className="inline-flex items-center rounded-full bg-blue-100 dark:bg-blue-900/30 px-3 py-1 text-sm font-medium text-blue-800 dark:text-blue-200 ring-1 ring-blue-600/20"
                     whileHover={{ scale: 1.05 }}
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.5 }}
                   >
-                    {sme.funding}
+                    {sme.funding || 'Series A'}
                   </motion.span>
+                  <motion.div
+                    className="text-2xl font-bold text-pulse-dark dark:text-white"
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.6 }}
+                  >
+                    ₦{(sme.loanAmount || 2500000).toLocaleString()}
+                    <span className="text-sm text-gray-500 font-normal ml-1">seeking</span>
+                  </motion.div>
                 </div>
               </div>
             </div>
             
-            {/* Score Circles */}
-            <div className="flex gap-4 items-center justify-center md:justify-end">
+            {/* Enhanced Score Display */}
+            <div className="flex gap-6 items-center justify-center lg:justify-end">
               <ScoreCircle label="Pulse Score" score={sme.pulseScore} color="pulse-cyan" />
               <ScoreCircle label="Profit Score" score={sme.profitScore} color="pulse-pink" />
             </div>
           </div>
         </div>
 
-        {/* Navigation Tabs */}
-        <div className="bg-pulse-light dark:bg-pulse-dark border-b border-gray-200 dark:border-gray-700">
-          <div className="flex px-6 gap-8">
+        {/* Enhanced Navigation Tabs */}
+        <div className="bg-white dark:bg-pulse-navy border-b border-gray-200 dark:border-gray-700">
+          <div className="flex px-8 gap-2">
             {tabs.map((tab) => (
               <motion.button
                 key={tab.id}
-                className={`flex flex-col items-center justify-center border-b-[3px] pb-[13px] pt-4 transition-colors ${
+                className={`flex items-center gap-2 px-6 py-4 border-b-3 transition-all duration-200 ${
                   activeTab === tab.id
-                    ? 'border-b-pulse-cyan text-pulse-dark dark:text-white'
-                    : 'border-b-transparent text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
+                    ? 'border-b-pulse-cyan text-pulse-cyan bg-pulse-cyan/5'
+                    : 'border-b-transparent text-gray-500 dark:text-gray-400 hover:text-pulse-cyan hover:bg-pulse-cyan/5'
                 }`}
                 onClick={() => setActiveTab(tab.id)}
-                whileHover={{ y: -2 }}
+                whileHover={{ y: -1 }}
+                whileTap={{ y: 0 }}
                 transition={{ duration: 0.2 }}
               >
-                <p className="text-sm font-bold">{tab.label}</p>
+                <span className="material-symbols-outlined text-lg">{tab.icon}</span>
+                <span className="font-medium">{tab.label}</span>
               </motion.button>
             ))}
           </div>
         </div>
 
         {/* Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 p-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 p-8">
           <div className="lg:col-span-2">
             <AnimatePresence mode="wait">
               <motion.div
@@ -136,17 +189,16 @@ const SMEProfilePage = () => {
                 transition={{ duration: 0.3 }}
               >
                 {activeTab === 'overview' && <OverviewTab sme={sme} />}
-                {activeTab === 'scores' && <ScoresTab sme={sme} />}
-                {activeTab === 'charts' && <ChartsTab sme={sme} />}
-                {activeTab === 'insights' && <InsightsTab sme={sme} />}
+                {activeTab === 'financial' && <FinancialTab sme={sme} cashFlowData={cashFlowData} revenueData={revenueData} />}
+                {activeTab === 'verification' && <VerificationTab sme={sme} />}
+                {activeTab === 'negotiation' && <NegotiationTab sme={sme} offers={offers} onSubmitOffer={handleSubmitOffer} />}
               </motion.div>
             </AnimatePresence>
           </div>
 
-          {/* Sidebar */}
-          <div className="lg:col-span-1 flex flex-col gap-8">
-            <InvestmentCard onInvest={handleInvest} />
-            <GrowthIndicator />
+          {/* Investment Card Sidebar */}
+          <div className="lg:col-span-1">
+            <InvestmentCard sme={sme} onMakeOffer={handleMakeOffer} />
           </div>
         </div>
       </div>
@@ -205,112 +257,283 @@ const ScoreCircle = ({ label, score, color }) => {
 
 const OverviewTab = ({ sme }) => (
   <div className="space-y-8">
+    {/* Investment Opportunity Summary */}
     <motion.div 
-      className="bg-white dark:bg-pulse-navy p-6 rounded-xl border border-gray-200 dark:border-gray-700"
+      className="bg-gradient-to-br from-white to-pulse-light dark:from-pulse-navy dark:to-pulse-dark p-8 rounded-2xl shadow-soft border border-gray-200 dark:border-gray-700"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <h2 className="text-pulse-dark dark:text-white text-xl font-bold mb-4">Overview</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="space-y-4">
-          <h3 className="font-semibold text-gray-700 dark:text-gray-300">Business Summary</h3>
-          <p className="text-gray-600 dark:text-gray-300 text-base leading-relaxed">
-            {sme.description}
-          </p>
+      <div className="flex items-center gap-3 mb-6">
+        <span className="material-symbols-outlined text-pulse-cyan text-2xl">investment</span>
+        <h2 className="text-pulse-dark dark:text-white text-2xl font-bold">Investment Opportunity</h2>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="text-center p-4 bg-white dark:bg-pulse-navy rounded-xl shadow-sm">
+          <div className="text-3xl font-bold text-pulse-cyan mb-2">₦{(sme.loanAmount || 2500000).toLocaleString()}</div>
+          <div className="text-sm text-gray-500">Funding Required</div>
         </div>
-        <div className="space-y-4">
-          <h3 className="font-semibold text-gray-700 dark:text-gray-300">Company Details</h3>
-          <div className="space-y-3">
-            <div className="flex items-start gap-3">
-              <span className="material-symbols-outlined text-xl text-gray-400 dark:text-gray-500 mt-0.5">person</span>
-              <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Founder & CEO</p>
-                <p className="font-medium text-pulse-dark dark:text-gray-200">{sme.founder}</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <span className="material-symbols-outlined text-xl text-gray-400 dark:text-gray-500 mt-0.5">apartment</span>
-              <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Location</p>
-                <p className="font-medium text-pulse-dark dark:text-gray-200">{sme.location}</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <span className="material-symbols-outlined text-xl text-gray-400 dark:text-gray-500 mt-0.5">calendar_today</span>
-              <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Founded</p>
-                <p className="font-medium text-pulse-dark dark:text-gray-200">{sme.founded}</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <span className="material-symbols-outlined text-xl text-gray-400 dark:text-gray-500 mt-0.5">group</span>
-              <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Employees</p>
-                <p className="font-medium text-pulse-dark dark:text-gray-200">{sme.employees}</p>
-              </div>
-            </div>
-          </div>
+        <div className="text-center p-4 bg-white dark:bg-pulse-navy rounded-xl shadow-sm">
+          <div className="text-3xl font-bold text-pulse-pink mb-2">{sme.interestRate || 15}%</div>
+          <div className="text-sm text-gray-500">Interest Rate</div>
+        </div>
+        <div className="text-center p-4 bg-white dark:bg-pulse-navy rounded-xl shadow-sm">
+          <div className="text-3xl font-bold text-green-500 mb-2">24</div>
+          <div className="text-sm text-gray-500">Months Tenure</div>
+        </div>
+        <div className="text-center p-4 bg-white dark:bg-pulse-navy rounded-xl shadow-sm">
+          <div className="text-3xl font-bold text-blue-500 mb-2">18-24%</div>
+          <div className="text-sm text-gray-500">Expected ROI</div>
         </div>
       </div>
+
+      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-6">
+        <h3 className="font-bold text-blue-800 dark:text-blue-200 mb-3 flex items-center gap-2">
+          <span className="material-symbols-outlined">psychology</span>
+          What PulseFi AI Says About This Business
+        </h3>
+        <p className="text-blue-700 dark:text-blue-300 leading-relaxed">
+          This SME demonstrates strong financial discipline with consistent cash flow patterns and verified business operations. 
+          The cross-verification of CAC documents, video evidence, and bank data shows high authenticity. 
+          Revenue growth trajectory indicates sustainable business model with low default risk.
+        </p>
+      </div>
     </motion.div>
-    
+
+    {/* Business Details */}
     <motion.div 
-      className="bg-white dark:bg-pulse-navy p-6 rounded-xl border border-gray-200 dark:border-gray-700"
+      className="bg-white dark:bg-pulse-navy p-8 rounded-2xl shadow-soft border border-gray-200 dark:border-gray-700"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.1 }}
     >
-      <h3 className="text-pulse-dark dark:text-white text-lg font-bold mb-4">Financial Highlights</h3>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="text-center p-4 bg-pulse-light dark:bg-pulse-dark/50 rounded-lg">
-          <p className="text-2xl font-bold text-pulse-dark dark:text-white">{sme.revenue}</p>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Annual Revenue</p>
+      <h3 className="text-pulse-dark dark:text-white text-xl font-bold mb-6">Business Profile</h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="space-y-6">
+          <div>
+            <h4 className="font-semibold text-gray-700 dark:text-gray-300 mb-3">Business Summary</h4>
+            <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+              {sme.description}
+            </p>
+          </div>
+          <div>
+            <h4 className="font-semibold text-gray-700 dark:text-gray-300 mb-3">Funding Purpose</h4>
+            <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+              Expansion of operations, inventory procurement, and working capital to meet growing demand in the {sme.industry} sector.
+            </p>
+          </div>
         </div>
-        <div className="text-center p-4 bg-pulse-light dark:bg-pulse-dark/50 rounded-lg">
-          <p className="text-2xl font-bold text-green-500">{sme.growth}</p>
-          <p className="text-sm text-gray-500 dark:text-gray-400">YoY Growth</p>
-        </div>
-        <div className="text-center p-4 bg-pulse-light dark:bg-pulse-dark/50 rounded-lg">
-          <p className="text-2xl font-bold text-blue-500">{sme.funding}</p>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Funding Stage</p>
+        <div className="space-y-4">
+          {[
+            { icon: 'person', label: 'Founder & CEO', value: sme.founder },
+            { icon: 'apartment', label: 'Location', value: sme.location },
+            { icon: 'calendar_today', label: 'Founded', value: sme.founded },
+            { icon: 'group', label: 'Employees', value: sme.employees },
+            { icon: 'category', label: 'Industry', value: sme.industry }
+          ].map((item, index) => (
+            <motion.div 
+              key={item.label}
+              className="flex items-center gap-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2 + index * 0.1 }}
+            >
+              <span className="material-symbols-outlined text-pulse-cyan">{item.icon}</span>
+              <div>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{item.label}</p>
+                <p className="font-medium text-pulse-dark dark:text-gray-200">{item.value}</p>
+              </div>
+            </motion.div>
+          ))}
         </div>
       </div>
     </motion.div>
   </div>
 );
 
-const ScoresTab = ({ sme }) => (
-  <motion.div 
-    className="bg-white dark:bg-pulse-navy p-6 rounded-xl border border-gray-200 dark:border-gray-700"
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.5 }}
-  >
-    <h2 className="text-pulse-dark dark:text-white text-xl font-bold mb-4">Scores Breakdown</h2>
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-      <ScoreBreakdown 
-        title={`Pulse Score Breakdown (${sme.pulseScore})`}
-        scores={[
-          { label: 'Form', value: 95, icon: 'description' },
-          { label: 'CAC', value: 80, icon: 'monitoring' },
-          { label: 'Video', value: 90, icon: 'videocam' },
-          { label: 'Bank', value: 75, icon: 'account_balance' }
-        ]}
-        color="pulse-cyan"
-      />
-      <ScoreBreakdown 
-        title={`Profit Score Analysis (${sme.profitScore})`}
-        scores={[
-          { label: 'Revenue', value: 88, icon: 'payments' },
-          { label: 'Cash Flow', value: 70, icon: 'account_balance_wallet' },
-          { label: 'Growth', value: 67, icon: 'trending_up' }
-        ]}
-        color="pulse-pink"
-      />
-    </div>
-  </motion.div>
+const FinancialTab = ({ sme, cashFlowData, revenueData }) => (
+  <div className="space-y-8">
+    {/* Cash Flow Chart */}
+    <motion.div 
+      className="bg-white dark:bg-pulse-navy p-8 rounded-2xl shadow-soft border border-gray-200 dark:border-gray-700"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      <h3 className="text-pulse-dark dark:text-white text-xl font-bold mb-6 flex items-center gap-2">
+        <span className="material-symbols-outlined text-pulse-cyan">waterfall_chart</span>
+        Cash Flow Analysis
+      </h3>
+      <div className="h-80">
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart data={cashFlowData}>
+            <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+            <XAxis dataKey="month" className="text-xs" />
+            <YAxis className="text-xs" />
+            <Tooltip 
+              contentStyle={{ 
+                backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+                border: 'none', 
+                borderRadius: '8px',
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+              }}
+            />
+            <Area type="monotone" dataKey="net" stroke="#00C4B4" fill="#00C4B4" fillOpacity={0.3} />
+            <Area type="monotone" dataKey="inflow" stroke="#10B981" fill="#10B981" fillOpacity={0.2} />
+          </AreaChart>
+        </ResponsiveContainer>
+      </div>
+    </motion.div>
+
+    {/* Revenue Growth */}
+    <motion.div 
+      className="bg-white dark:bg-pulse-navy p-8 rounded-2xl shadow-soft border border-gray-200 dark:border-gray-700"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: 0.1 }}
+    >
+      <h3 className="text-pulse-dark dark:text-white text-xl font-bold mb-6 flex items-center gap-2">
+        <span className="material-symbols-outlined text-pulse-pink">trending_up</span>
+        Revenue Growth Trajectory
+      </h3>
+      <div className="h-80">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={revenueData}>
+            <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+            <XAxis dataKey="quarter" className="text-xs" />
+            <YAxis className="text-xs" />
+            <Tooltip 
+              contentStyle={{ 
+                backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+                border: 'none', 
+                borderRadius: '8px',
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+              }}
+            />
+            <Bar dataKey="revenue" fill="#FF6B9D" radius={[4, 4, 0, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    </motion.div>
+
+    {/* Financial Metrics */}
+    <motion.div 
+      className="grid grid-cols-1 md:grid-cols-3 gap-6"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: 0.2 }}
+    >
+      {[
+        { label: 'Monthly Revenue', value: '₦650K', change: '+15%', color: 'green' },
+        { label: 'Profit Margin', value: '28%', change: '+3%', color: 'blue' },
+        { label: 'Debt-to-Equity', value: '0.35', change: '-5%', color: 'purple' }
+      ].map((metric, index) => (
+        <div key={metric.label} className="bg-white dark:bg-pulse-navy p-6 rounded-xl shadow-soft border border-gray-200 dark:border-gray-700">
+          <div className="text-2xl font-bold text-pulse-dark dark:text-white mb-1">{metric.value}</div>
+          <div className="text-sm text-gray-500 mb-2">{metric.label}</div>
+          <div className={`text-sm font-medium ${
+            metric.color === 'green' ? 'text-green-600' : 
+            metric.color === 'blue' ? 'text-blue-600' : 'text-purple-600'
+          }`}>
+            {metric.change} vs last quarter
+          </div>
+        </div>
+      ))}
+    </motion.div>
+  </div>
 );
+
+const VerificationTab = ({ sme }) => (
+  <div className="space-y-8">
+    {/* Pulse Score Breakdown */}
+    <motion.div 
+      className="bg-white dark:bg-pulse-navy p-8 rounded-2xl shadow-soft border border-gray-200 dark:border-gray-700"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      <h3 className="text-pulse-dark dark:text-white text-xl font-bold mb-6 flex items-center gap-2">
+        <span className="material-symbols-outlined text-pulse-cyan">verified_user</span>
+        Trust Verification Breakdown
+      </h3>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {[
+          { label: 'Form Data Match', score: 95, icon: 'description', description: 'Business information consistency' },
+          { label: 'CAC Verification', score: 88, icon: 'gavel', description: 'Corporate Affairs Commission validation' },
+          { label: 'Video Verification', score: 92, icon: 'videocam', description: 'Live business operations proof' },
+          { label: 'Bank Data Match', score: 85, icon: 'account_balance', description: 'Financial records alignment' }
+        ].map((item, index) => (
+          <motion.div 
+            key={item.label}
+            className="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: index * 0.1 }}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <span className="material-symbols-outlined text-pulse-cyan text-xl">{item.icon}</span>
+                <div>
+                  <h4 className="font-bold text-pulse-dark dark:text-white">{item.label}</h4>
+                  <p className="text-sm text-gray-500">{item.description}</p>
+                </div>
+              </div>
+              <div className="text-2xl font-bold text-pulse-cyan">{item.score}</div>
+            </div>
+            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+              <motion.div
+                className="bg-pulse-cyan h-2 rounded-full"
+                initial={{ width: 0 }}
+                animate={{ width: `${item.score}%` }}
+                transition={{ duration: 1, delay: 0.5 + index * 0.1 }}
+              />
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    </motion.div>
+
+    {/* Verification Timeline */}
+    <motion.div 
+      className="bg-white dark:bg-pulse-navy p-8 rounded-2xl shadow-soft border border-gray-200 dark:border-gray-700"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: 0.2 }}
+    >
+      <h3 className="text-pulse-dark dark:text-white text-xl font-bold mb-6">Verification Timeline</h3>
+      <div className="space-y-4">
+        {[
+          { step: 'Business Registration', date: '2023-08-15', status: 'completed', icon: 'check_circle' },
+          { step: 'Document Verification', date: '2023-08-16', status: 'completed', icon: 'check_circle' },
+          { step: 'Video Validation', date: '2023-08-17', status: 'completed', icon: 'check_circle' },
+          { step: 'Bank Account Linking', date: '2023-08-18', status: 'completed', icon: 'check_circle' },
+          { step: 'AI Analysis Complete', date: '2023-08-19', status: 'completed', icon: 'psychology' }
+        ].map((item, index) => (
+          <motion.div 
+            key={item.step}
+            className="flex items-center gap-4 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: index * 0.1 }}
+          >
+            <span className="material-symbols-outlined text-green-600">{item.icon}</span>
+            <div className="flex-1">
+              <p className="font-medium text-pulse-dark dark:text-white">{item.step}</p>
+              <p className="text-sm text-gray-500">{new Date(item.date).toLocaleDateString()}</p>
+            </div>
+            <span className="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 rounded-full text-sm font-medium">
+              Verified
+            </span>
+          </motion.div>
+        ))}
+      </div>
+    </motion.div>
+  </div>
+);
+
+
 
 const ScoreBreakdown = ({ title, scores, color }) => (
   <div>
@@ -342,138 +565,13 @@ const ScoreBreakdown = ({ title, scores, color }) => (
   </div>
 );
 
-const ChartsTab = () => (
-  <motion.div 
-    className="bg-white dark:bg-pulse-navy p-6 rounded-xl border border-gray-200 dark:border-gray-700"
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.5 }}
-  >
-    <h2 className="text-pulse-dark dark:text-white text-xl font-bold mb-4">Financial Charts</h2>
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div>
-        <h3 className="text-gray-700 dark:text-gray-200 font-semibold mb-2">Revenue vs. Expenses</h3>
-        <div className="bg-pulse-light dark:bg-pulse-dark/50 p-4 rounded-lg h-48 flex items-center justify-center">
-          <span className="text-gray-500">Chart Placeholder</span>
-        </div>
-      </div>
-      <div>
-        <h3 className="text-gray-700 dark:text-gray-200 font-semibold mb-2">Transaction Heatmap</h3>
-        <div className="bg-pulse-light dark:bg-pulse-dark/50 p-4 rounded-lg h-48 flex items-center justify-center">
-          <span className="text-gray-500">Heatmap Placeholder</span>
-        </div>
-      </div>
-    </div>
-  </motion.div>
-);
 
-const InsightsTab = () => (
-  <motion.div 
-    className="bg-white dark:bg-pulse-navy p-6 rounded-xl border border-gray-200 dark:border-gray-700"
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.5 }}
-  >
-    <h2 className="text-pulse-dark dark:text-white text-xl font-bold mb-4">AI Insights & Recommendations</h2>
-    <div className="space-y-3">
-      {[
-        { type: 'positive', icon: 'lightbulb', title: 'Positive Cash Flow', description: 'Company maintains a consistent positive cash flow, a strong indicator of financial health.' },
-        { type: 'warning', icon: 'trending_down', title: 'Customer Churn', description: 'Observed a 5% increase in customer churn in Q2. Recommend investigating customer satisfaction metrics.' },
-        { type: 'info', icon: 'recommend', title: 'Recommendation', description: 'Explore expanding into the APAC market, which shows a 30% YoY growth for similar SaaS products.' }
-      ].map((insight, index) => (
-        <motion.div 
-          key={index}
-          className={`flex items-start gap-4 p-4 rounded-lg ${
-            insight.type === 'positive' ? 'bg-green-50 dark:bg-green-900/30' :
-            insight.type === 'warning' ? 'bg-yellow-50 dark:bg-yellow-900/30' :
-            'bg-blue-50 dark:bg-blue-900/30'
-          }`}
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: index * 0.1 }}
-        >
-          <div className={`flex-shrink-0 mt-1 ${
-            insight.type === 'positive' ? 'text-green-500 dark:text-green-400' :
-            insight.type === 'warning' ? 'text-yellow-500 dark:text-yellow-400' :
-            'text-blue-500 dark:text-blue-400'
-          }`}>
-            <span className="material-symbols-outlined">{insight.icon}</span>
-          </div>
-          <div>
-            <h4 className={`font-bold ${
-              insight.type === 'positive' ? 'text-green-800 dark:text-green-200' :
-              insight.type === 'warning' ? 'text-yellow-800 dark:text-yellow-200' :
-              'text-blue-800 dark:text-blue-200'
-            }`}>
-              {insight.title}
-            </h4>
-            <p className={`text-sm ${
-              insight.type === 'positive' ? 'text-green-700 dark:text-green-300' :
-              insight.type === 'warning' ? 'text-yellow-700 dark:text-yellow-300' :
-              'text-blue-700 dark:text-blue-300'
-            }`}>
-              {insight.description}
-            </p>
-          </div>
-        </motion.div>
-      ))}
-    </div>
-  </motion.div>
-);
 
-const InvestmentCard = ({ onInvest }) => (
-  <motion.div 
-    className="sticky top-8 bg-white dark:bg-pulse-navy p-6 rounded-xl border border-gray-200 dark:border-gray-700 text-center"
-    initial={{ opacity: 0, scale: 0.9 }}
-    animate={{ opacity: 1, scale: 1 }}
-    transition={{ duration: 0.5, delay: 0.3 }}
-  >
-    <h3 className="text-pulse-dark dark:text-white text-lg font-bold">Ready to Invest?</h3>
-    <p className="text-gray-600 dark:text-gray-300 text-sm my-3">
-      Become a part of this company's journey. This investment opportunity closes in 15 days.
-    </p>
-    <motion.button 
-      className="flex w-full min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-4 text-white text-base font-bold invest-button-gradient"
-      onClick={onInvest}
-      whileHover={{ scale: 1.02, boxShadow: "0 10px 25px rgba(0, 196, 180, 0.3)" }}
-      whileTap={{ scale: 0.98 }}
-      transition={{ duration: 0.2 }}
-    >
-      <span className="truncate">Invest Now</span>
-    </motion.button>
-  </motion.div>
-);
 
-const GrowthIndicator = () => (
-  <motion.div 
-    className="bg-white dark:bg-pulse-navy p-6 rounded-xl border border-gray-200 dark:border-gray-700"
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.5, delay: 0.4 }}
-  >
-    <h3 className="text-pulse-dark dark:text-white text-lg font-bold mb-4">Growth Indicator</h3>
-    <div className="flex flex-col items-center">
-      <div className="flex items-baseline gap-2">
-        <motion.span 
-          className="text-4xl font-bold text-green-500 dark:text-green-400"
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: 0.5, delay: 0.6 }}
-        >
-          25%
-        </motion.span>
-        <span className="text-gray-500 dark:text-gray-400">QoQ Revenue Growth</span>
-      </div>
-      <p className="text-sm text-gray-500 dark:text-gray-400 mt-2 text-center">
-        Exceeding industry average of 15% for Q4.
-      </p>
-      <div className="mt-4 flex items-center gap-1 text-green-600 dark:text-green-400">
-        <span className="material-symbols-outlined">trending_up</span>
-        <span className="text-sm font-medium">Strong Growth Trajectory</span>
-      </div>
-    </div>
-  </motion.div>
-);
+
+
+
+
 
 const InvestmentModal = ({ sme, onClose, onConfirm }) => {
   const [amount, setAmount] = useState('');

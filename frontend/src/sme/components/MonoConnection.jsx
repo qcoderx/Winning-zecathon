@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import LoadingScreen from '../../components/LoadingScreen';
 
 const MonoConnection = ({ data, onComplete, onBack, canGoBack }) => {
   const [isConnecting, setIsConnecting] = useState(false);
@@ -84,7 +85,7 @@ const MonoConnection = ({ data, onComplete, onBack, canGoBack }) => {
         </div>
 
         {/* Connection Status */}
-        {!connectionResult && (
+        {!connectionResult && !isConnecting && (
           <div className="text-center py-8">
             <div className="w-20 h-20 mx-auto mb-4 bg-pulse-cyan/10 rounded-full flex items-center justify-center">
               <span className="material-symbols-outlined text-pulse-cyan text-3xl">
@@ -100,20 +101,23 @@ const MonoConnection = ({ data, onComplete, onBack, canGoBack }) => {
             
             <motion.button
               onClick={handleConnectBank}
-              disabled={isConnecting}
-              className="px-8 py-3 pulse-gradient-bg text-white font-semibold rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
-              whileHover={{ scale: !isConnecting ? 1.05 : 1 }}
-              whileTap={{ scale: !isConnecting ? 0.95 : 1 }}
+              className="px-8 py-3 pulse-gradient-bg text-white font-semibold rounded-lg"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
-              {isConnecting ? (
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Connecting...
-                </div>
-              ) : (
-                'Connect Bank Account'
-              )}
+              Connect Bank Account
             </motion.button>
+          </div>
+        )}
+
+        {/* Loading Screen During Connection */}
+        {isConnecting && (
+          <div className="py-8">
+            <LoadingScreen 
+              message="Connecting to your bank account securely..."
+              showLogo={false}
+              variant="minimal"
+            />
           </div>
         )}
 
