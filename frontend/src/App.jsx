@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import Features from './components/Features';
@@ -6,37 +6,15 @@ import Process from './components/Process';
 import Opportunities from './components/Opportunities';
 import Footer from './components/Footer';
 import { AuthPage } from './auth';
-import { MarketplacePage } from './marketplace';
+import { MarketplacePage, SMEProfilePage } from './marketplace';
 import './App.css';
 
-function App() {
-  const [currentView, setCurrentView] = useState('landing'); // 'landing', 'auth', 'marketplace'
+const LandingPage = () => {
+  const navigate = useNavigate();
 
   const handleAuthClick = () => {
-    console.log('Auth button clicked!');
-    setCurrentView('auth');
+    navigate('/auth');
   };
-
-  const handleMarketplaceClick = () => {
-    console.log('Marketplace button clicked!');
-    setCurrentView('marketplace');
-  };
-
-  const handleLoginSuccess = () => {
-    console.log('Login successful, redirecting to marketplace');
-    setCurrentView('marketplace');
-  };
-
-  // Set global login success handler
-  window.onLoginSuccess = handleLoginSuccess;
-
-  if (currentView === 'auth') {
-    return <AuthPage />;
-  }
-
-  if (currentView === 'marketplace') {
-    return <MarketplacePage />;
-  }
 
   return (
     <div className="relative w-full overflow-x-hidden">
@@ -49,6 +27,31 @@ function App() {
       </main>
       <Footer />
     </div>
+  );
+};
+
+const AuthPageWrapper = () => {
+  const navigate = useNavigate();
+
+  const handleLoginSuccess = () => {
+    navigate('/marketplace');
+  };
+
+  window.onLoginSuccess = handleLoginSuccess;
+
+  return <AuthPage />;
+};
+
+function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/auth" element={<AuthPageWrapper />} />
+        <Route path="/marketplace" element={<MarketplacePage />} />
+        <Route path="/marketplace/profile/:id" element={<SMEProfilePage />} />
+      </Routes>
+    </Router>
   );
 }
 

@@ -50,6 +50,14 @@ const Header = ({ onSearch }) => {
       
       <div className="flex items-center gap-4 md:gap-6">
         <motion.button 
+          className="lg:hidden text-gray-500 dark:text-gray-400 hover:text-pulse-navy dark:hover:text-white transition-colors"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <span className="material-symbols-outlined">search</span>
+        </motion.button>
+        
+        <motion.button 
           className="relative text-gray-500 dark:text-gray-400 hover:text-pulse-navy dark:hover:text-white transition-colors"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}

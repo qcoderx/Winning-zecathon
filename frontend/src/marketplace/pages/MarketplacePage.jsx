@@ -1,22 +1,20 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
 import StatsCards from '../components/StatsCards';
 import SMECard from '../components/SMECard';
 import Pagination from '../components/Pagination';
-import SMEProfile from '../components/SMEProfile';
 import { useMarketplace } from '../hooks/useMarketplace';
 
 const MarketplacePage = () => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedSME, setSelectedSME] = useState(null);
-  const [showProfile, setShowProfile] = useState(false);
-  const { smes, stats, loading, filters, updateFilters } = useMarketplace();
+  const navigate = useNavigate();
+  const { smes, stats, loading, filters, updateFilters, search } = useMarketplace();
 
   const handleSearch = (query) => {
-    // Search functionality would be implemented here
-    console.log('Searching for:', query);
+    search(query);
   };
 
   const handleFiltersChange = (newFilters) => {
@@ -24,18 +22,7 @@ const MarketplacePage = () => {
   };
 
   const handleViewDetails = (sme) => {
-    setSelectedSME(sme);
-    setShowProfile(true);
-  };
-
-  const handleCloseProfile = () => {
-    setShowProfile(false);
-    setSelectedSME(null);
-  };
-
-  const handleInvestment = (sme) => {
-    console.log('Investment confirmed for:', sme.name);
-    // Here you would integrate with payment processing
+    navigate(`/marketplace/profile/${sme.id}`);
   };
 
   const handlePageChange = (page) => {
@@ -106,17 +93,6 @@ const MarketplacePage = () => {
           )}
         </motion.main>
       </div>
-      
-      {/* SME Profile Modal */}
-      <AnimatePresence>
-        {showProfile && selectedSME && (
-          <SMEProfile 
-            sme={selectedSME}
-            onClose={handleCloseProfile}
-            onInvest={handleInvestment}
-          />
-        )}
-      </AnimatePresence>
     </div>
   );
 };

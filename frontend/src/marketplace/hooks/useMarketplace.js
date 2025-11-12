@@ -11,72 +11,153 @@ const mockAPI = {
         id: 1,
         name: 'Naija Agri-Tech',
         industry: 'Agriculture',
-        location: 'Lagos, NG',
-        image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuD7oScqIP3pOSUpe8YZN-e33E6G1dMN7QPLznaRiTLi4eVaOJ0VW3UR-ebypeNCHN9CTS-_uedqbjUnTIDfzmge84lzTWKMBd9fdPBlYVCbNfHvQsux0VR6qDObZ2bnMlIBIzIUvTBm6WmyDwpMdblHciWUmz_VO7KgKdrBc6B4_Dmf9LhqDsgtb62v4yGX6iOcdRgf3dzWarL-0TXdn4hlJf2IR3-lrGkI5No-IyOh1-2cbN_gYMFtztOBxkcQXag8zNLeLnXMXWM',
+        location: 'Lagos, Nigeria',
+        image: 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=400&h=400&fit=crop',
         pulseScore: 92,
         profitScore: 88,
         isVerified: true,
-        description: 'Innovative agricultural technology solutions for sustainable farming in Nigeria.'
+        description: 'Innovative agricultural technology solutions for sustainable farming in Nigeria. We provide smart irrigation systems, crop monitoring tools, and data analytics to help farmers increase yield and reduce costs.',
+        founder: 'Adebayo Ogundimu',
+        founded: '2019',
+        employees: '45-60',
+        revenue: '₦2.5B',
+        growth: '+35%',
+        funding: 'Series A'
       },
       {
         id: 2,
         name: 'Kobo Retail',
         industry: 'Retail',
-        location: 'Abuja, NG',
-        image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAHFwBFGRJi77Cx9oHhNUczkwFqDSJE4JyNNVEyrJBrdJMI4WM62ETYwlRpXc8ANFeyngm-S2S419q9d9cMccwGy_KOuuLVDG6lYrbpo3ARZ3fRAUc1duoeOrGVoflYAyYzRFBLniNq7gJhX-ID2TO3lw1MMW6lL69qzY0BgfcAzYlTIe5SHHRA3GHTdAIdSxnMyOEFZMg8xL0unb9cxCUQsqDSqEF0zaCT4AUoQOIxq43f3O8cNO2-Y7tWerVQXoDtHjPuvVWb5NA',
+        location: 'Abuja, Nigeria',
+        image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&h=400&fit=crop',
         pulseScore: 85,
         profitScore: 75,
         isVerified: true,
-        description: 'Modern retail solutions connecting local businesses with customers across Nigeria.'
+        description: 'Modern retail solutions connecting local businesses with customers across Nigeria. Our platform enables seamless inventory management, customer engagement, and digital payments for small and medium retailers.',
+        founder: 'Fatima Abdullahi',
+        founded: '2020',
+        employees: '25-35',
+        revenue: '₦1.8B',
+        growth: '+28%',
+        funding: 'Seed'
       },
       {
         id: 3,
         name: 'HealthBridge',
         industry: 'Healthcare',
-        location: 'Port Harcourt, NG',
-        image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBPVA9D3goH7g0HWgHjCVeWbR4cZBO4WF_psX0gvHaM0EbivnXmulylLorIOOSn-W0t-z2V7d4Ngbo6EvWe56cvQ4Uno3Jy9rXXptDH1NsSHbpr8S4JXZvxOUG6xzVesGhi6Q28UsLRa1ozWhgL-2vqrnUqJiPduzg9ir9rDRX-ShC0FOxdYvicXx_25ig3k29WAfG3ezBpXeLaOZlpE5d_Fa3LOisBxT7QHxiRi32mLHLqQBxX0YS6BKaFvJovAg1mFf5Arl_zYRM',
+        location: 'Port Harcourt, Nigeria',
+        image: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&h=400&fit=crop',
         pulseScore: 78,
         profitScore: 65,
         isVerified: true,
-        description: 'Bridging healthcare gaps with innovative medical technology and telemedicine solutions.'
+        description: 'Bridging healthcare gaps with innovative medical technology and telemedicine solutions. We connect patients with healthcare providers through our digital platform, making quality healthcare accessible to underserved communities.',
+        founder: 'Dr. Chinedu Okwu',
+        founded: '2018',
+        employees: '35-50',
+        revenue: '₦1.2B',
+        growth: '+22%',
+        funding: 'Pre-Series A'
       },
       {
         id: 4,
         name: 'BuildRight Ltd',
         industry: 'Construction',
-        location: 'Kano, NG',
-        image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuClSGkAbHjJGSyL_QG3eJzsHuZUiUnJYdsTFgcdC2BzvOVLF6d1ISqFAnbcnIxJPMi8CjYvI28GwWcE7q_y6xN_t5R33bpl2sCrjzGOuGjAq0iXFuvESAWITBrWQiKsKa4u6TNLFDyDwOaSJE8piBL-wqjZ2p1fWg1OqfODfg_0O-vjurpK18ZaCri04k6WKaYecgZ9_7Ie6KkNveuCvgqVTRcaZ0SAVvVZEwNq4abQ2MFasrnZOSjmA1RK0tax-9vteP2mmVHnolk',
+        location: 'Kano, Nigeria',
+        image: 'https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=400&h=400&fit=crop',
         pulseScore: 81,
         profitScore: 80,
         isVerified: true,
-        description: 'Sustainable construction solutions with focus on affordable housing and infrastructure.'
+        description: 'Sustainable construction solutions with focus on affordable housing and infrastructure. We use innovative building materials and techniques to deliver cost-effective, environmentally friendly construction projects.',
+        founder: 'Musa Ibrahim',
+        founded: '2017',
+        employees: '80-120',
+        revenue: '₦4.2B',
+        growth: '+18%',
+        funding: 'Series A'
       },
       {
         id: 5,
         name: 'EduTech Nigeria',
         industry: 'Technology',
-        location: 'Lagos, NG',
-        image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400',
+        location: 'Lagos, Nigeria',
+        image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=400&fit=crop',
         pulseScore: 89,
         profitScore: 82,
         isVerified: true,
-        description: 'Educational technology platform revolutionizing learning across Nigerian schools.'
+        description: 'Educational technology platform revolutionizing learning across Nigerian schools. Our AI-powered learning management system provides personalized education experiences and helps teachers track student progress effectively.',
+        founder: 'Kemi Adeyemi',
+        founded: '2019',
+        employees: '55-75',
+        revenue: '₦3.1B',
+        growth: '+42%',
+        funding: 'Series A'
       },
       {
         id: 6,
         name: 'GreenEnergy Solutions',
         industry: 'Manufacturing',
-        location: 'Abuja, NG',
-        image: 'https://images.unsplash.com/photo-1466611653911-95081537e5b7?w=400',
+        location: 'Abuja, Nigeria',
+        image: 'https://images.unsplash.com/photo-1466611653911-95081537e5b7?w=400&h=400&fit=crop',
         pulseScore: 76,
         profitScore: 71,
         isVerified: true,
-        description: 'Renewable energy solutions and solar panel manufacturing for sustainable power.'
+        description: 'Renewable energy solutions and solar panel manufacturing for sustainable power. We design, manufacture, and install solar energy systems for residential, commercial, and industrial applications across West Africa.',
+        founder: 'Amina Hassan',
+        founded: '2016',
+        employees: '90-150',
+        revenue: '₦5.8B',
+        growth: '+15%',
+        funding: 'Series B'
+      },
+      {
+        id: 7,
+        name: 'FinFlow Nigeria',
+        industry: 'FinTech',
+        location: 'Lagos, Nigeria',
+        image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=400&fit=crop',
+        pulseScore: 94,
+        profitScore: 91,
+        isVerified: true,
+        description: 'Digital financial services platform providing banking, lending, and investment solutions for SMEs. Our technology enables businesses to access credit, manage cash flow, and grow their operations efficiently.',
+        founder: 'Olumide Soyombo',
+        founded: '2018',
+        employees: '120-180',
+        revenue: '₦8.5B',
+        growth: '+65%',
+        funding: 'Series B'
+      },
+      {
+        id: 8,
+        name: 'LogiTrans',
+        industry: 'Logistics',
+        location: 'Ibadan, Nigeria',
+        image: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=400&h=400&fit=crop',
+        pulseScore: 83,
+        profitScore: 77,
+        isVerified: true,
+        description: 'Smart logistics and supply chain management solutions for African businesses. We optimize delivery routes, manage inventory, and provide real-time tracking for efficient goods movement across Nigeria.',
+        founder: 'Tunde Bakare',
+        founded: '2020',
+        employees: '65-85',
+        revenue: '₦2.9B',
+        growth: '+38%',
+        funding: 'Series A'
       }
     ];
 
-    // Apply filters
+    // Apply search filter
     let filteredSMEs = allSMEs;
+    
+    if (filters.search && filters.search.trim()) {
+      const searchTerm = filters.search.toLowerCase().trim();
+      filteredSMEs = filteredSMEs.filter(sme => 
+        sme.name.toLowerCase().includes(searchTerm) ||
+        sme.industry.toLowerCase().includes(searchTerm) ||
+        sme.location.toLowerCase().includes(searchTerm) ||
+        sme.description.toLowerCase().includes(searchTerm) ||
+        sme.founder.toLowerCase().includes(searchTerm)
+      );
+    }
     
     if (filters.industry && filters.industry !== 'All Industries') {
       filteredSMEs = filteredSMEs.filter(sme => sme.industry === filters.industry);
@@ -104,9 +185,15 @@ const mockAPI = {
         totalSMEs: allSMEs.length.toLocaleString(),
         avgPulseScore: Math.round(allSMEs.reduce((sum, sme) => sum + sme.pulseScore, 0) / allSMEs.length),
         avgProfitScore: Math.round(allSMEs.reduce((sum, sme) => sum + sme.profitScore, 0) / allSMEs.length),
-        topIndustries: 'AgriTech, FinTech'
+        topIndustries: 'FinTech, AgriTech'
       }
     };
+  },
+
+  async getSMEById(id) {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    const result = await this.fetchSMEs();
+    return result.data.find(sme => sme.id === parseInt(id));
   }
 };
 
@@ -115,6 +202,7 @@ export const useMarketplace = () => {
   const [stats, setStats] = useState({});
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
+    search: '',
     industry: 'All Industries',
     location: 'All Locations (Nigeria)',
     profitScore: 0,
@@ -141,6 +229,10 @@ export const useMarketplace = () => {
     fetchData(updatedFilters);
   };
 
+  const search = (query) => {
+    updateFilters({ search: query });
+  };
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -150,6 +242,32 @@ export const useMarketplace = () => {
     stats,
     loading,
     filters,
-    updateFilters
+    updateFilters,
+    search
   };
+};
+
+export const useSMEProfile = (id) => {
+  const [sme, setSME] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchSME = async () => {
+      setLoading(true);
+      try {
+        const result = await mockAPI.getSMEById(id);
+        setSME(result);
+      } catch (err) {
+        console.error('SME Profile error:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchSME();
+    }
+  }, [id]);
+
+  return { sme, loading };
 };
