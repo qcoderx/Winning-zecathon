@@ -60,7 +60,7 @@ const Header = ({ onAuthClick }) => {
               }}
               whileTap={{ scale: 0.95 }}
               transition={{ duration: 0.2 }}
-              onClick={onAuthClick}
+              onClick={() => onAuthClick()}
             >
               <span className="truncate">Sign Up</span>
             </motion.button>

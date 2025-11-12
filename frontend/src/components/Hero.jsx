@@ -107,8 +107,9 @@ const Hero = ({ onAuthClick }) => {
             }}
             whileTap={{ scale: 0.95 }}
             transition={{ duration: 0.2 }}
+            onClick={() => onAuthClick('sme')}
           >
-            <span className="truncate">Learn More</span>
+            <span className="truncate">Sign Up as SME</span>
           </motion.button>
         </motion.div>
       </div>
