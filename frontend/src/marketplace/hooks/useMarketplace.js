@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useLoading } from '../../contexts/LoadingContext';
 
 // Mock API service
 const mockAPI = {
@@ -208,9 +209,11 @@ export const useMarketplace = () => {
     profitScore: 0,
     sortBy: 'Highest Pulse Score'
   });
+  const { setLoading: setGlobalLoading } = useLoading();
 
   const fetchData = async (newFilters = filters) => {
     setLoading(true);
+    setGlobalLoading('marketplace', true, 'Loading marketplace data...');
     
     try {
       const result = await mockAPI.fetchSMEs(newFilters);
@@ -220,6 +223,7 @@ export const useMarketplace = () => {
       console.error('Marketplace error:', err);
     } finally {
       setLoading(false);
+      setGlobalLoading('marketplace', false);
     }
   };
 
@@ -250,10 +254,12 @@ export const useMarketplace = () => {
 export const useSMEProfile = (id) => {
   const [sme, setSME] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { setLoading: setGlobalLoading } = useLoading();
 
   useEffect(() => {
     const fetchSME = async () => {
       setLoading(true);
+      setGlobalLoading('sme-profile', true, 'Loading company profile...');
       try {
         const result = await mockAPI.getSMEById(id);
         setSME(result);
@@ -261,13 +267,14 @@ export const useSMEProfile = (id) => {
         console.error('SME Profile error:', err);
       } finally {
         setLoading(false);
+        setGlobalLoading('sme-profile', false);
       }
     };
 
     if (id) {
       fetchSME();
     }
-  }, [id]);
+  }, [id, setGlobalLoading]);
 
   return { sme, loading };
 };

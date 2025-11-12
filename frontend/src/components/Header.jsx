@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { PulsefiLogo } from './LoadingScreen';
 
 const Header = ({ onAuthClick }) => {
   return (
@@ -17,19 +18,8 @@ const Header = ({ onAuthClick }) => {
               whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.2 }}
             >
-              <motion.img 
-                src="/src/pulsi-logo-removebg-preview.png"
-                alt="PulseFi Logo"
-                className="h-48 w-48" 
-                animate={{ 
-                  rotate: [0, 5, -5, 0]
-                }}
-                transition={{ 
-                  duration: 4, 
-                  repeat: Infinity, 
-                  ease: "easeInOut" 
-                }}
-              />
+              <PulsefiLogo size={40} />
+              <span className="text-xl font-bold text-pulse-dark dark:text-white">PulseFi</span>
             </motion.a>
           </div>
           <div className="flex items-center gap-6">

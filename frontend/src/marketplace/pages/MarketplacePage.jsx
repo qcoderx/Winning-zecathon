@@ -6,6 +6,7 @@ import Sidebar from '../components/Sidebar';
 import StatsCards from '../components/StatsCards';
 import SMECard from '../components/SMECard';
 import Pagination from '../components/Pagination';
+import LoadingScreen from '../../components/LoadingScreen';
 import { useMarketplace } from '../hooks/useMarketplace';
 
 const MarketplacePage = () => {
@@ -48,18 +49,9 @@ const MarketplacePage = () => {
           
           <AnimatePresence mode="wait">
             {loading ? (
-              <motion.div 
-                className="flex items-center justify-center py-20"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                <motion.div 
-                  className="w-12 h-12 border-4 border-pulse-cyan border-t-transparent rounded-full"
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                />
-              </motion.div>
+              <div className="py-20">
+                <LoadingScreen variant="minimal" message="Loading marketplace data..." showLogo={false} />
+              </div>
             ) : (
               <motion.div 
                 className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6"

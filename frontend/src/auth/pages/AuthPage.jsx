@@ -6,6 +6,7 @@ import EmailInput from '../components/EmailInput';
 import PasswordInput from '../components/PasswordInput';
 import SocialButtons from '../components/SocialButtons';
 import Alert from '../components/Alert';
+import { PulsefiLogo } from '../../components/LoadingScreen';
 
 const AuthPage = () => {
   const [activeTab, setActiveTab] = useState('signup');
@@ -78,13 +79,10 @@ const AuthPage = () => {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
-            <motion.img 
-              src="/src/pulsi-logo-removebg-preview.png"
-              alt="PulseFi Logo"
-              className="h-16 w-auto"
-              animate={{ rotate: [0, 2, -2, 0] }}
-              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-            />
+            <div className="flex items-center gap-3">
+              <PulsefiLogo size={64} />
+              <span className="text-3xl font-bold text-pulse-dark dark:text-white">PulseFi</span>
+            </div>
           </motion.div>
 
           {/* Auth Form */}
