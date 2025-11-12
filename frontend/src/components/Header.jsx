@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { PulsefiLogo } from './LoadingScreen';
 
 const Header = ({ onAuthClick }) => {
   return (
@@ -17,19 +18,7 @@ const Header = ({ onAuthClick }) => {
               whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.2 }}
             >
-              <motion.img 
-                src="/src/pulsi-logo-removebg-preview.png"
-                alt="PulseFi Logo"
-                className="h-48 w-48" 
-                animate={{ 
-                  rotate: [0, 5, -5, 0]
-                }}
-                transition={{ 
-                  duration: 4, 
-                  repeat: Infinity, 
-                  ease: "easeInOut" 
-                }}
-              />
+              <PulsefiLogo size={120} />
             </motion.a>
           </div>
           <div className="flex items-center gap-6">
@@ -60,7 +49,7 @@ const Header = ({ onAuthClick }) => {
               }}
               whileTap={{ scale: 0.95 }}
               transition={{ duration: 0.2 }}
-              onClick={onAuthClick}
+              onClick={() => onAuthClick()}
             >
               <span className="truncate">Sign Up</span>
             </motion.button>

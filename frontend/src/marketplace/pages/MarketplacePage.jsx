@@ -1,22 +1,21 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
 import StatsCards from '../components/StatsCards';
 import SMECard from '../components/SMECard';
 import Pagination from '../components/Pagination';
-import SMEProfile from '../components/SMEProfile';
+import LoadingScreen from '../../components/LoadingScreen';
 import { useMarketplace } from '../hooks/useMarketplace';
 
 const MarketplacePage = () => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedSME, setSelectedSME] = useState(null);
-  const [showProfile, setShowProfile] = useState(false);
-  const { smes, stats, loading, filters, updateFilters } = useMarketplace();
+  const navigate = useNavigate();
+  const { smes, stats, loading, filters, updateFilters, search } = useMarketplace();
 
   const handleSearch = (query) => {
-    // Search functionality would be implemented here
-    console.log('Searching for:', query);
+    search(query);
   };
 
   const handleFiltersChange = (newFilters) => {
@@ -24,18 +23,7 @@ const MarketplacePage = () => {
   };
 
   const handleViewDetails = (sme) => {
-    setSelectedSME(sme);
-    setShowProfile(true);
-  };
-
-  const handleCloseProfile = () => {
-    setShowProfile(false);
-    setSelectedSME(null);
-  };
-
-  const handleInvestment = (sme) => {
-    console.log('Investment confirmed for:', sme.name);
-    // Here you would integrate with payment processing
+    navigate(`/marketplace/profile/${sme.id}`);
   };
 
   const handlePageChange = (page) => {
@@ -61,18 +49,9 @@ const MarketplacePage = () => {
           
           <AnimatePresence mode="wait">
             {loading ? (
-              <motion.div 
-                className="flex items-center justify-center py-20"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                <motion.div 
-                  className="w-12 h-12 border-4 border-pulse-cyan border-t-transparent rounded-full"
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                />
-              </motion.div>
+              <div className="py-20">
+                <LoadingScreen variant="minimal" message="Loading marketplace data..." showLogo={false} />
+              </div>
             ) : (
               <motion.div 
                 className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6"
@@ -106,17 +85,6 @@ const MarketplacePage = () => {
           )}
         </motion.main>
       </div>
-      
-      {/* SME Profile Modal */}
-      <AnimatePresence>
-        {showProfile && selectedSME && (
-          <SMEProfile 
-            sme={selectedSME}
-            onClose={handleCloseProfile}
-            onInvest={handleInvestment}
-          />
-        )}
-      </AnimatePresence>
     </div>
   );
 };

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { PulsefiLogo } from '../../components/LoadingScreen';
 
 const Header = ({ onSearch }) => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -20,12 +21,7 @@ const Header = ({ onSearch }) => {
     >
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2 text-pulse-navy dark:text-white">
-          <div className="size-8 text-pulse-cyan">
-            <svg fill="currentColor" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
-              <path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96v96a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80Zm-80,84a12,12,0,1,1,12-12A12,12,0,0,1,128,164Zm32-84H96V56a32,32,0,0,1,64,0Z" />
-            </svg>
-          </div>
-          <h1 className="text-xl font-bold">PulseFi</h1>
+          <PulsefiLogo size={96} />
         </div>
         <div className="hidden md:block h-6 w-px bg-gray-200 dark:bg-gray-700" />
         <h2 className="hidden md:block text-lg font-medium text-gray-600 dark:text-gray-300">Marketplace</h2>
@@ -49,6 +45,14 @@ const Header = ({ onSearch }) => {
       </div>
       
       <div className="flex items-center gap-4 md:gap-6">
+        <motion.button 
+          className="lg:hidden text-gray-500 dark:text-gray-400 hover:text-pulse-navy dark:hover:text-white transition-colors"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <span className="material-symbols-outlined">search</span>
+        </motion.button>
+        
         <motion.button 
           className="relative text-gray-500 dark:text-gray-400 hover:text-pulse-navy dark:hover:text-white transition-colors"
           whileHover={{ scale: 1.1 }}

@@ -1,42 +1,27 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import Features from './components/Features';
 import Process from './components/Process';
 import Opportunities from './components/Opportunities';
 import Footer from './components/Footer';
+import LoadingScreen from './components/LoadingScreen';
+import UserTypeSelector from './components/UserTypeSelector';
 import { AuthPage } from './auth';
-import { MarketplacePage } from './marketplace';
+import { MarketplacePage, SMEProfilePage } from './marketplace';
+import SMEApp from './SMEApp';
+import { LoadingProvider } from './contexts/LoadingContext';
 import './App.css';
 
-function App() {
-  const [currentView, setCurrentView] = useState('landing'); // 'landing', 'auth', 'marketplace'
+const LandingPage = () => {
+  const navigate = useNavigate();
 
   const handleAuthClick = () => {
-    console.log('Auth button clicked!');
-    setCurrentView('auth');
+    navigate('/user-type');
   };
 
-  const handleMarketplaceClick = () => {
-    console.log('Marketplace button clicked!');
-    setCurrentView('marketplace');
-  };
-
-  const handleLoginSuccess = () => {
-    console.log('Login successful, redirecting to marketplace');
-    setCurrentView('marketplace');
-  };
-
-  // Set global login success handler
-  window.onLoginSuccess = handleLoginSuccess;
-
-  if (currentView === 'auth') {
-    return <AuthPage />;
-  }
-
-  if (currentView === 'marketplace') {
-    return <MarketplacePage />;
-  }
 
   return (
     <div className="relative w-full overflow-x-hidden">
@@ -49,6 +34,69 @@ function App() {
       </main>
       <Footer />
     </div>
+  );
+};
+
+const UserTypePage = () => {
+  const navigate = useNavigate();
+
+  const handleUserTypeSelect = (userType) => {
+    if (userType === 'sme') {
+      navigate('/sme');
+    } else {
+      navigate('/auth');
+    }
+  };
+
+  return <UserTypeSelector onUserTypeSelect={handleUserTypeSelect} />;
+};
+
+const AuthPageWrapper = () => {
+  const navigate = useNavigate();
+
+  const handleLoginSuccess = () => {
+    navigate('/marketplace');
+  };
+
+  window.onLoginSuccess = handleLoginSuccess;
+
+  return <AuthPage />;
+};
+
+function App() {
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsInitialLoading(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
+    <LoadingProvider>
+      <AnimatePresence mode="wait">
+        {isInitialLoading ? (
+          <LoadingScreen 
+            variant="splash"
+            message="Initializing PulseFi..."
+            key="splash"
+          />
+        ) : (
+          <Router key="app">
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/user-type" element={<UserTypePage />} />
+              <Route path="/auth" element={<AuthPageWrapper />} />
+              <Route path="/marketplace" element={<MarketplacePage />} />
+              <Route path="/marketplace/profile/:id" element={<SMEProfilePage />} />
+              <Route path="/sme/*" element={<SMEApp />} />
+            </Routes>
+          </Router>
+        )}
+      </AnimatePresence>
+    </LoadingProvider>
   );
 }
 
