@@ -8,8 +8,10 @@ import Process from './components/Process';
 import Opportunities from './components/Opportunities';
 import Footer from './components/Footer';
 import LoadingScreen from './components/LoadingScreen';
+import UserTypeSelector from './components/UserTypeSelector';
 import { AuthPage } from './auth';
 import { MarketplacePage, SMEProfilePage } from './marketplace';
+import SMEApp from './SMEApp';
 import { LoadingProvider } from './contexts/LoadingContext';
 import './App.css';
 
@@ -17,8 +19,9 @@ const LandingPage = () => {
   const navigate = useNavigate();
 
   const handleAuthClick = () => {
-    navigate('/auth');
+    navigate('/user-type');
   };
+
 
   return (
     <div className="relative w-full overflow-x-hidden">
@@ -32,6 +35,20 @@ const LandingPage = () => {
       <Footer />
     </div>
   );
+};
+
+const UserTypePage = () => {
+  const navigate = useNavigate();
+
+  const handleUserTypeSelect = (userType) => {
+    if (userType === 'sme') {
+      navigate('/sme');
+    } else {
+      navigate('/auth');
+    }
+  };
+
+  return <UserTypeSelector onUserTypeSelect={handleUserTypeSelect} />;
 };
 
 const AuthPageWrapper = () => {
@@ -70,9 +87,11 @@ function App() {
           <Router key="app">
             <Routes>
               <Route path="/" element={<LandingPage />} />
+              <Route path="/user-type" element={<UserTypePage />} />
               <Route path="/auth" element={<AuthPageWrapper />} />
               <Route path="/marketplace" element={<MarketplacePage />} />
               <Route path="/marketplace/profile/:id" element={<SMEProfilePage />} />
+              <Route path="/sme/*" element={<SMEApp />} />
             </Routes>
           </Router>
         )}
