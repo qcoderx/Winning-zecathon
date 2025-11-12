@@ -176,7 +176,7 @@ const SMECard = ({ sme, onViewDetails, viewMode = 'grid' }) => {
         }}
         whileTap={{ scale: 0.98 }}
         animate={{ 
-          backgroundColor: isHovered ? "rgba(0, 196, 180, 0.05)" : "transparent"
+          backgroundColor: isHovered ? "rgba(0, 196, 180, 0.05)" : "rgba(0, 0, 0, 0)"
         }}
         transition={{ duration: 0.2 }}
       >

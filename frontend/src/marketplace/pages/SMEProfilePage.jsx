@@ -10,6 +10,8 @@ import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
 const SMEProfilePage = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [showInvestModal, setShowInvestModal] = useState(false);
+  const [offers, setOffers] = useState([]);
+  const [showNegotiation, setShowNegotiation] = useState(false);
   const navigate = useNavigate();
   const { id } = useParams();
   const { sme, loading } = useSMEProfile(id);
@@ -25,9 +27,6 @@ const SMEProfilePage = () => {
       </div>
     );
   }
-
-  const [offers, setOffers] = useState([]);
-  const [showNegotiation, setShowNegotiation] = useState(false);
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: 'overview' },
