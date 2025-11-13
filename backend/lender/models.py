@@ -1,8 +1,8 @@
 from django.db import models
-from django.contrib.auth import get_user_model
+from django.conf import settings  # <-- CHANGED: Import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
 
-User = get_user_model()
+# User = get_user_model() # <-- REMOVED: This line causes the error
 
 class LenderProfile(models.Model):
     LENDER_TYPE_CHOICES = [
@@ -13,7 +13,12 @@ class LenderProfile(models.Model):
         ('other', 'Other'),
     ]
     
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='lender_profile')
+    # <-- CHANGED: Use the settings.AUTH_USER_MODEL string
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL, 
+        on_delete=models.CASCADE, 
+        related_name='lender_profile'
+    )
     lender_type = models.CharField(max_length=50, choices=LENDER_TYPE_CHOICES)
     company_name = models.CharField(max_length=255)
     company_registration_number = models.CharField(max_length=100, blank=True)
