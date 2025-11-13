@@ -14,6 +14,7 @@ import { AuthPage } from './auth';
 import { MarketplacePage, SMEProfilePage } from './marketplace';
 import SMEApp from './SMEApp';
 import LenderApp from './LenderApp';
+import EscrowDemo from './components/EscrowDemo';
 import { LoadingProvider } from './contexts/LoadingContext';
 import './App.css';
 
@@ -97,6 +98,7 @@ function App() {
               <Route path="/auth" element={<AuthPageWrapper />} />
               <Route path="/marketplace" element={<MarketplacePage />} />
               <Route path="/marketplace/profile/:id" element={<SMEProfilePage />} />
+              <Route path="/demo/escrow" element={<EscrowDemo />} />
               <Route path="/sme/*" element={<SMEApp />} />
               <Route path="/lender/*" element={<LenderApp />} />
             </Routes>

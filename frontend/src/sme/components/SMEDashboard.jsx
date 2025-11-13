@@ -3,37 +3,36 @@ import { motion } from 'framer-motion';
 import VerificationStatus from './VerificationStatus';
 import VerificationModal from './VerificationModal';
 
-const SMEDashboard = () => {
+const SMEDashboard = ({ user }) => {
   const [loanApplications, setLoanApplications] = useState([]);
   const [pitches, setPitches] = useState([]);
   const [showVerificationModal, setShowVerificationModal] = useState(false);
-  const [verificationState, setVerificationState] = useState('unverified');
-  const [pulseScore, setPulseScore] = useState(null);
-  const [profitScore, setProfitScore] = useState(null);
+  const [currentUser, setCurrentUser] = useState(user);
 
-  // Check verification status on mount
+  // Check for user updates
   useEffect(() => {
-    const savedState = localStorage.getItem('sme_verification_state');
-    const savedPulseScore = localStorage.getItem('sme_pulse_score');
-    const savedProfitScore = localStorage.getItem('sme_profit_score');
+    const checkUserUpdates = () => {
+      const userData = localStorage.getItem('sme_user');
+      if (userData) {
+        const parsedUser = JSON.parse(userData);
+        setCurrentUser(parsedUser);
+      }
+    };
+
+    // Check immediately
+    checkUserUpdates();
     
-    if (savedState) {
-      setVerificationState(savedState);
-      if (savedPulseScore) setPulseScore(parseInt(savedPulseScore));
-      if (savedProfitScore) setProfitScore(parseInt(savedProfitScore));
-    }
+    // Check every 2 seconds for updates
+    const interval = setInterval(checkUserUpdates, 2000);
+    return () => clearInterval(interval);
   }, []);
 
   const handleVerificationComplete = () => {
-    // Refresh verification status
-    const savedState = localStorage.getItem('sme_verification_state');
-    const savedPulseScore = localStorage.getItem('sme_pulse_score');
-    const savedProfitScore = localStorage.getItem('sme_profit_score');
-    
-    if (savedState) {
-      setVerificationState(savedState);
-      if (savedPulseScore) setPulseScore(parseInt(savedPulseScore));
-      if (savedProfitScore) setProfitScore(parseInt(savedProfitScore));
+    // Refresh user data
+    const userData = localStorage.getItem('sme_user');
+    if (userData) {
+      const parsedUser = JSON.parse(userData);
+      setCurrentUser(parsedUser);
     }
   };
 
@@ -45,21 +44,34 @@ const SMEDashboard = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-pulse-navy dark:text-white">SME Dashboard</h1>
-          <p className="text-gray-600 dark:text-gray-400">Manage your funding journey</p>
+          <h1 className="text-3xl font-bold text-pulse-navy dark:text-white">
+            Welcome, {currentUser?.firstName || 'SME'}
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400">
+            {currentUser?.businessName || 'Manage your funding journey'}
+          </p>
         </div>
         <div className="flex items-center gap-4">
-          {verificationState === 'verified' ? (
+          {currentUser?.verificationStatus === 'verified' ? (
             <>
               <div className="text-right">
                 <div className="text-sm text-gray-500">Pulse Score</div>
-                <div className="text-2xl font-bold text-pulse-cyan">{pulseScore}</div>
+                <div className="text-2xl font-bold text-pulse-cyan">{currentUser?.pulseScore || 0}</div>
               </div>
               <div className="text-right">
                 <div className="text-sm text-gray-500">Profit Score</div>
-                <div className="text-2xl font-bold text-pulse-pink">{profitScore}</div>
+                <div className="text-2xl font-bold text-pulse-pink">{currentUser?.profitScore || 0}</div>
               </div>
             </>
+          ) : currentUser?.verificationStatus === 'processing' ? (
+            <div className="flex items-center gap-2 px-4 py-2 bg-yellow-100 text-yellow-800 rounded-lg">
+              <motion.div
+                className="w-4 h-4 border-2 border-yellow-600 border-t-transparent rounded-full"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+              />
+              <span className="font-medium">Processing...</span>
+            </div>
           ) : (
             <motion.button
               onClick={() => setShowVerificationModal(true)}
@@ -76,7 +88,7 @@ const SMEDashboard = () => {
       <OverviewTab 
         loanApplications={loanApplications} 
         pitches={pitches} 
-        verificationState={verificationState}
+        user={currentUser}
         onStartVerification={() => setShowVerificationModal(true)}
         onRetryVerification={() => setShowVerificationModal(true)}
       />
@@ -90,11 +102,12 @@ const SMEDashboard = () => {
   );
 };
 
-const OverviewTab = ({ loanApplications, pitches, verificationState, onStartVerification, onRetryVerification }) => (
+const OverviewTab = ({ loanApplications, pitches, user, onStartVerification, onRetryVerification }) => (
   <div className="space-y-6">
     {/* Verification Status */}
-    {verificationState !== 'verified' && (
+    {user?.verificationStatus !== 'verified' && (
       <VerificationStatus
+        user={user}
         onStartVerification={onStartVerification}
         onRetryVerification={onRetryVerification}
       />

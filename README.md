@@ -692,7 +692,255 @@ Respond to investment offer
 
 ---
 
-### 📊 **5. ANALYTICS & REPORTING ENDPOINTS**
+### 🔒 **5. ESCROW & FUND MANAGEMENT ENDPOINTS**
+
+#### **GET /api/escrow/:loanId**
+Get escrow account details
+```json
+// Response (200 OK)
+{
+  "success": true,
+  "data": {
+    "escrowId": "escrow_12345",
+    "loanId": "loan_12345",
+    "totalAmount": 5000000,
+    "releasedAmount": 2000000,
+    "pendingAmount": 3000000,
+    "status": "active",
+    "milestones": [
+      {
+        "id": 1,
+        "title": "Initial Working Capital",
+        "amount": 2000000,
+        "status": "released",
+        "releaseDate": "2024-11-01",
+        "description": "Initial funds for operational needs",
+        "evidence": ["receipt_001.pdf"],
+        "feedback": "Funds utilized effectively"
+      },
+      {
+        "id": 2,
+        "title": "Inventory Purchase",
+        "amount": 1500000,
+        "status": "pending_approval",
+        "dueDate": "2024-12-15",
+        "description": "Purchase of premium inventory",
+        "requirements": ["Purchase orders", "Invoices"],
+        "submittedEvidence": ["po_001.pdf"]
+      }
+    ]
+  }
+}
+```
+
+#### **POST /api/escrow/release/:milestoneId**
+Release funds for completed milestone
+```json
+// Request Body
+{
+  "approvalNotes": "Milestone completed satisfactorily",
+  "releaseAmount": 1500000
+}
+
+// Response (200 OK)
+{
+  "success": true,
+  "message": "Funds released successfully",
+  "data": {
+    "milestoneId": 2,
+    "releasedAmount": 1500000,
+    "releaseDate": "2024-11-12",
+    "transactionId": "txn_67890"
+  }
+}
+```
+
+#### **POST /api/escrow/milestones/:milestoneId/evidence**
+SME submits evidence for milestone completion
+```json
+// Request: multipart/form-data
+// Fields:
+// - files: Evidence documents (PDF/Images)
+// - description: Evidence description
+
+// Response (201 Created)
+{
+  "success": true,
+  "message": "Evidence submitted successfully",
+  "data": {
+    "milestoneId": 2,
+    "evidenceFiles": ["evidence_001.pdf", "evidence_002.jpg"],
+    "submittedAt": "2024-11-12T10:30:00Z",
+    "status": "pending_review"
+  }
+}
+```
+
+---
+
+### 📊 **6. PULSE MONITORING ENDPOINTS**
+
+#### **GET /api/monitoring/:smeId**
+Get real-time business monitoring data
+```json
+// Response (200 OK)
+{
+  "success": true,
+  "data": {
+    "currentPulseScore": 87,
+    "previousPulseScore": 85,
+    "trend": "improving",
+    "lastUpdated": "2024-11-12T10:30:00Z",
+    "businessHealth": {
+      "revenue": { "current": 2800000, "previous": 2500000, "trend": "up" },
+      "expenses": { "current": 1900000, "previous": 2000000, "trend": "down" },
+      "cashFlow": { "current": 900000, "previous": 500000, "trend": "up" },
+      "transactions": { "current": 1250, "previous": 1100, "trend": "up" }
+    },
+    "riskFactors": [
+      { "factor": "Payment Delays", "level": "low", "score": 15 },
+      { "factor": "Cash Flow Volatility", "level": "medium", "score": 35 }
+    ],
+    "recentActivities": [
+      {
+        "id": 1,
+        "type": "transaction",
+        "description": "Large payment received from major client",
+        "amount": 450000,
+        "timestamp": "2024-11-12T08:15:00Z",
+        "impact": "positive"
+      }
+    ]
+  }
+}
+```
+
+#### **GET /api/monitoring/:smeId/alerts**
+Get active monitoring alerts
+```json
+// Response (200 OK)
+{
+  "success": true,
+  "data": {
+    "alerts": [
+      {
+        "id": 1,
+        "type": "warning",
+        "title": "Unusual Spending Pattern",
+        "description": "Higher than normal expenses detected",
+        "timestamp": "2024-11-12T09:00:00Z",
+        "severity": "medium"
+      }
+    ]
+  }
+}
+```
+
+#### **GET /api/monitoring/:smeId/pulse-history**
+Get historical pulse score data
+```json
+// Query Parameters:
+// ?period=6months&granularity=monthly
+
+// Response (200 OK)
+{
+  "success": true,
+  "data": {
+    "history": [
+      { "month": "Jul", "score": 78 },
+      { "month": "Aug", "score": 82 },
+      { "month": "Sep", "score": 79 },
+      { "month": "Oct", "score": 85 },
+      { "month": "Nov", "score": 87 }
+    ]
+  }
+}
+```
+
+---
+
+### 💬 **7. COMMUNICATION & FEEDBACK ENDPOINTS**
+
+#### **POST /api/investments/:investmentId/feedback**
+Lender sends feedback to SME
+```json
+// Request Body
+{
+  "message": "Great progress on inventory expansion. Keep up the good work!",
+  "type": "positive", // "positive", "request", "warning", "general"
+  "milestoneId": 1 // optional
+}
+
+// Response (201 Created)
+{
+  "success": true,
+  "message": "Feedback sent successfully",
+  "data": {
+    "feedbackId": "feedback_12345",
+    "timestamp": "2024-11-12T14:30:00Z",
+    "status": "sent"
+  }
+}
+```
+
+#### **GET /api/investments/:investmentId/feedback**
+Get feedback history
+```json
+// Response (200 OK)
+{
+  "success": true,
+  "data": {
+    "feedback": [
+      {
+        "id": 1,
+        "message": "Great progress on the inventory expansion",
+        "timestamp": "2024-11-10T14:30:00Z",
+        "type": "positive",
+        "milestoneId": 1,
+        "senderType": "lender"
+      }
+    ]
+  }
+}
+```
+
+---
+
+### 📊 **8. ANALYTICS & REPORTING ENDPOINTS**
+
+#### **GET /api/lender/investments**
+Get lender's investment portfolio
+```json
+// Response (200 OK)
+{
+  "success": true,
+  "data": {
+    "investments": [
+      {
+        "id": "inv_12345",
+        "smeId": "sme_12345",
+        "smeName": "Sade Fashion House",
+        "industry": "Fashion",
+        "amount": 5000000,
+        "currentROI": 22,
+        "totalReturns": 1100000,
+        "status": "active",
+        "startDate": "2024-08-15",
+        "remainingMonths": 18,
+        "riskLevel": "low",
+        "completedMilestones": 2,
+        "totalMilestones": 4
+      }
+    ],
+    "summary": {
+      "totalInvestments": 3,
+      "totalDeployed": 16500000,
+      "averageROI": 21.7,
+      "totalReturns": 3415000
+    }
+  }
+}
+```
 
 #### **GET /api/admin/analytics/overview**
 Get platform analytics (Admin only)

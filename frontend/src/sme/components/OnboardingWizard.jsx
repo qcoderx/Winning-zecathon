@@ -7,7 +7,7 @@ import BusinessTypeCheck from './BusinessTypeCheck';
 import VideoRecorder from './VideoRecorder';
 import MonoConnection from './MonoConnection';
 
-const OnboardingWizard = ({ onComplete }) => {
+const OnboardingWizard = ({ onComplete, user }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     businessInfo: {},
@@ -35,6 +35,26 @@ const OnboardingWizard = ({ onComplete }) => {
     } else if (currentStep < steps.length) {
       setCurrentStep(currentStep + 1);
     } else {
+      // Update user verification status
+      const updatedUser = {
+        ...user,
+        verificationStatus: 'processing',
+        pulseScore: null,
+        profitScore: null
+      };
+      localStorage.setItem('sme_user', JSON.stringify(updatedUser));
+      
+      // Simulate AI processing
+      setTimeout(() => {
+        const verifiedUser = {
+          ...updatedUser,
+          verificationStatus: 'verified',
+          pulseScore: 87,
+          profitScore: 74
+        };
+        localStorage.setItem('sme_user', JSON.stringify(verifiedUser));
+      }, 3000);
+      
       onComplete?.(updatedData);
     }
   };
