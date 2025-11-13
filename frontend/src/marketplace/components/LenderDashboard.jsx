@@ -91,7 +91,7 @@ const LenderDashboard = () => {
             {activeTab === 'marketplace' && <MarketplacePage />}
             {activeTab === 'applications' && <ApplicationsTab applications={applications} />}
             {activeTab === 'offers' && <OffersTab offers={offers} />}
-            {activeTab === 'portfolio' && <PortfolioTab />}
+            {activeTab === 'portfolio' && <PortfolioTab onViewInvestment={(id) => window.location.href = `/lender/investments/${id}`} />}
             {activeTab === 'profile' && <LenderProfilePage />}
           </motion.div>
         </AnimatePresence>
@@ -204,104 +204,174 @@ const OffersTab = ({ offers }) => (
   </div>
 );
 
-const PortfolioTab = () => (
-  <div className="space-y-6">
-    <h2 className="text-2xl font-bold text-pulse-dark dark:text-white">Investment Portfolio</h2>
-    
-    {/* Portfolio Stats */}
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-      <motion.div 
-        className="bg-white dark:bg-pulse-navy rounded-xl p-6 shadow-soft"
-        whileHover={{ y: -4 }}
-      >
-        <div className="flex items-center">
-          <div className="p-2 bg-pulse-green/10 rounded-lg">
-            <span className="material-symbols-outlined text-pulse-green">account_balance_wallet</span>
-          </div>
-          <div className="ml-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400">Total Invested</p>
-            <p className="text-2xl font-bold text-pulse-dark dark:text-white">₦125M</p>
-          </div>
-        </div>
-      </motion.div>
+const PortfolioTab = ({ onViewInvestment }) => {
+  const investments = [
+    { 
+      id: 1, 
+      name: 'Sade Fashion House', 
+      amount: '₦5M', 
+      roi: '22%', 
+      status: 'Active',
+      industry: 'Fashion',
+      milestones: '2/4 completed',
+      nextMilestone: 'Inventory Purchase',
+      escrowBalance: '₦3M pending'
+    },
+    { 
+      id: 2, 
+      name: 'TechFlow Solutions', 
+      amount: '₦8M', 
+      roi: '18%', 
+      status: 'Active',
+      industry: 'FinTech',
+      milestones: '3/5 completed',
+      nextMilestone: 'Marketing Campaign',
+      escrowBalance: '₦2.5M pending'
+    },
+    { 
+      id: 3, 
+      name: 'Green Agro Ltd', 
+      amount: '₦3.5M', 
+      roi: '25%', 
+      status: 'Active',
+      industry: 'AgriTech',
+      milestones: '1/3 completed',
+      nextMilestone: 'Equipment Purchase',
+      escrowBalance: '₦2.8M pending'
+    }
+  ];
 
-      <motion.div 
-        className="bg-white dark:bg-pulse-navy rounded-xl p-6 shadow-soft"
-        whileHover={{ y: -4 }}
-      >
-        <div className="flex items-center">
-          <div className="p-2 bg-pulse-cyan/10 rounded-lg">
-            <span className="material-symbols-outlined text-pulse-cyan">trending_up</span>
-          </div>
-          <div className="ml-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400">Returns</p>
-            <p className="text-2xl font-bold text-pulse-dark dark:text-white">₦23.1M</p>
-          </div>
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold text-pulse-dark dark:text-white">Investment Portfolio</h2>
+        <div className="text-sm text-gray-500">
+          Click any investment to manage escrow & monitoring
         </div>
-      </motion.div>
-
-      <motion.div 
-        className="bg-white dark:bg-pulse-navy rounded-xl p-6 shadow-soft"
-        whileHover={{ y: -4 }}
-      >
-        <div className="flex items-center">
-          <div className="p-2 bg-pulse-pink/10 rounded-lg">
-            <span className="material-symbols-outlined text-pulse-pink">business</span>
-          </div>
-          <div className="ml-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400">Active SMEs</p>
-            <p className="text-2xl font-bold text-pulse-dark dark:text-white">12</p>
-          </div>
-        </div>
-      </motion.div>
-
-      <motion.div 
-        className="bg-white dark:bg-pulse-navy rounded-xl p-6 shadow-soft"
-        whileHover={{ y: -4 }}
-      >
-        <div className="flex items-center">
-          <div className="p-2 bg-yellow-500/10 rounded-lg">
-            <span className="material-symbols-outlined text-yellow-500">schedule</span>
-          </div>
-          <div className="ml-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400">Avg ROI</p>
-            <p className="text-2xl font-bold text-pulse-dark dark:text-white">18.5%</p>
-          </div>
-        </div>
-      </motion.div>
-    </div>
-
-    {/* Portfolio Holdings */}
-    <div className="bg-white dark:bg-pulse-navy rounded-xl p-6 shadow-soft">
-      <h3 className="text-lg font-bold text-pulse-dark dark:text-white mb-4">Current Investments</h3>
-      <div className="space-y-4">
-        {[
-          { name: 'TechFlow Solutions', amount: '₦15M', roi: '22%', status: 'Performing' },
-          { name: 'Green Agro Ltd', amount: '₦8M', roi: '18%', status: 'Performing' },
-          { name: 'Urban Retail Co', amount: '₦12M', roi: '15%', status: 'Watch' }
-        ].map((investment, index) => (
-          <motion.div
-            key={index}
-            className="flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg"
-            whileHover={{ x: 4 }}
-          >
-            <div>
-              <h4 className="font-bold text-pulse-dark dark:text-white">{investment.name}</h4>
-              <p className="text-sm text-gray-500">Investment: {investment.amount}</p>
+      </div>
+      
+      {/* Portfolio Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <motion.div 
+          className="bg-white dark:bg-pulse-navy rounded-xl p-6 shadow-soft"
+          whileHover={{ y: -4 }}
+        >
+          <div className="flex items-center">
+            <div className="p-2 bg-pulse-green/10 rounded-lg">
+              <span className="material-symbols-outlined text-pulse-green">account_balance_wallet</span>
             </div>
-            <div className="text-right">
-              <div className="font-bold text-pulse-green">{investment.roi} ROI</div>
-              <span className={`text-xs px-2 py-1 rounded-full ${
-                investment.status === 'Performing' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
-              }`}>
-                {investment.status}
-              </span>
+            <div className="ml-4">
+              <p className="text-sm text-gray-600 dark:text-gray-400">Total Invested</p>
+              <p className="text-2xl font-bold text-pulse-dark dark:text-white">₦16.5M</p>
             </div>
-          </motion.div>
-        ))}
+          </div>
+        </motion.div>
+
+        <motion.div 
+          className="bg-white dark:bg-pulse-navy rounded-xl p-6 shadow-soft"
+          whileHover={{ y: -4 }}
+        >
+          <div className="flex items-center">
+            <div className="p-2 bg-pulse-cyan/10 rounded-lg">
+              <span className="material-symbols-outlined text-pulse-cyan">trending_up</span>
+            </div>
+            <div className="ml-4">
+              <p className="text-sm text-gray-600 dark:text-gray-400">Total Returns</p>
+              <p className="text-2xl font-bold text-pulse-dark dark:text-white">₦3.4M</p>
+            </div>
+          </div>
+        </motion.div>
+
+        <motion.div 
+          className="bg-white dark:bg-pulse-navy rounded-xl p-6 shadow-soft"
+          whileHover={{ y: -4 }}
+        >
+          <div className="flex items-center">
+            <div className="p-2 bg-pulse-pink/10 rounded-lg">
+              <span className="material-symbols-outlined text-pulse-pink">business</span>
+            </div>
+            <div className="ml-4">
+              <p className="text-sm text-gray-600 dark:text-gray-400">Active SMEs</p>
+              <p className="text-2xl font-bold text-pulse-dark dark:text-white">{investments.length}</p>
+            </div>
+          </div>
+        </motion.div>
+
+        <motion.div 
+          className="bg-white dark:bg-pulse-navy rounded-xl p-6 shadow-soft"
+          whileHover={{ y: -4 }}
+        >
+          <div className="flex items-center">
+            <div className="p-2 bg-yellow-500/10 rounded-lg">
+              <span className="material-symbols-outlined text-yellow-500">account_balance</span>
+            </div>
+            <div className="ml-4">
+              <p className="text-sm text-gray-600 dark:text-gray-400">Escrow Balance</p>
+              <p className="text-2xl font-bold text-pulse-dark dark:text-white">₦8.3M</p>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Portfolio Holdings */}
+      <div className="bg-white dark:bg-pulse-navy rounded-xl p-6 shadow-soft">
+        <h3 className="text-lg font-bold text-pulse-dark dark:text-white mb-4">Active Investments</h3>
+        <div className="space-y-4">
+          {investments.map((investment) => (
+            <motion.div
+              key={investment.id}
+              className="flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              whileHover={{ x: 4, scale: 1.01 }}
+              whileTap={{ scale: 0.99 }}
+              onClick={() => onViewInvestment?.(investment.id)}
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-pulse-cyan/20 rounded-lg flex items-center justify-center">
+                  <span className="material-symbols-outlined text-pulse-cyan">business</span>
+                </div>
+                <div>
+                  <h4 className="font-bold text-pulse-dark dark:text-white">{investment.name}</h4>
+                  <p className="text-sm text-gray-500">
+                    {investment.industry} • {investment.amount} • {investment.milestones}
+                  </p>
+                  <div className="flex items-center gap-4 mt-1">
+                    <span className="text-xs text-pulse-cyan font-medium">
+                      Next: {investment.nextMilestone}
+                    </span>
+                    <span className="text-xs text-yellow-600">
+                      {investment.escrowBalance}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="font-bold text-pulse-green text-lg">{investment.roi} ROI</div>
+                <span className={`text-xs px-2 py-1 rounded-full ${
+                  investment.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                }`}>
+                  {investment.status}
+                </span>
+                <div className="text-xs text-pulse-cyan mt-1 flex items-center gap-1">
+                  <span className="material-symbols-outlined text-xs">manage_accounts</span>
+                  Manage
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+        
+        <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+          <div className="flex items-center gap-3">
+            <span className="material-symbols-outlined text-blue-600">info</span>
+            <div className="text-sm text-blue-800 dark:text-blue-200">
+              <p className="font-medium mb-1">Investment Management Features</p>
+              <p>Click any investment to access escrow management, pulse monitoring, milestone tracking, and communication tools.</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default LenderDashboard;

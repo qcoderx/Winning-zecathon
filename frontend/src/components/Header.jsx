@@ -23,11 +23,18 @@ const Header = ({ onAuthClick }) => {
           </div>
           <div className="flex items-center gap-6">
             <nav className="hidden md:flex items-center gap-9">
-              {['How it Works', 'Marketplace', 'About Us'].map((item, index) => (
+              {[
+                { label: 'How it Works', href: '#' },
+                { label: 'Marketplace', href: '#' },
+                { label: 'Escrow Demo', href: '/demo/escrow' },
+                { label: 'About Us', href: '#' }
+              ].map((item, index) => (
                 <motion.a 
-                  key={item}
-                  className="text-pulse-dark dark:text-gray-300 text-sm font-medium hover:text-pulse-teal dark:hover:text-white" 
-                  href="#"
+                  key={item.label}
+                  className={`text-pulse-dark dark:text-gray-300 text-sm font-medium hover:text-pulse-teal dark:hover:text-white ${
+                    item.label === 'Escrow Demo' ? 'bg-pulse-cyan/10 px-3 py-1 rounded-lg border border-pulse-cyan/20' : ''
+                  }`}
+                  href={item.href}
                   initial={{ opacity: 0, y: -20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 * index, duration: 0.5 }}
@@ -37,7 +44,7 @@ const Header = ({ onAuthClick }) => {
                     transition: { duration: 0.2 } 
                   }}
                 >
-                  {item}
+                  {item.label}
                 </motion.a>
               ))}
             </nav>
@@ -51,7 +58,7 @@ const Header = ({ onAuthClick }) => {
               transition={{ duration: 0.2 }}
               onClick={() => onAuthClick()}
             >
-              <span className="truncate">Sign Up</span>
+              <span className="truncate">Get Started</span>
             </motion.button>
           </div>
         </div>

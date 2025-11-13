@@ -185,7 +185,7 @@ const Hero = ({ onAuthClick }) => {
             transition={{ duration: 0.2 }}
             onClick={onAuthClick}
           >
-            <span className="truncate">Sign Up as Investor</span>
+            <span className="truncate">Get Started</span>
           </motion.button>
           <motion.button 
             className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-white/10 text-white text-base font-bold leading-normal tracking-[0.015em] border border-white/20"
@@ -196,9 +196,9 @@ const Hero = ({ onAuthClick }) => {
             }}
             whileTap={{ scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            onClick={() => onAuthClick('sme')}
+            onClick={() => window.location.href = '#'}
           >
-            <span className="truncate">Sign Up as SME</span>
+            <span className="truncate">Learn More</span>
           </motion.button>
         </motion.div>
       </div>

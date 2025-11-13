@@ -33,7 +33,9 @@ const AppNavigation = ({ userType = 'guest' }) => {
         { path: '/sme/dashboard', label: 'Dashboard', icon: 'dashboard' },
         { path: '/sme/applications', label: 'Applications', icon: 'request_quote' },
         { path: '/sme/lenders', label: 'Find Lenders', icon: 'search' },
-        { path: '/sme/pitches', label: 'My Pitches', icon: 'send' },
+        { path: '/sme/offers', label: 'Investment Offers', icon: 'handshake' },
+        { path: '/sme/escrow', label: 'Escrow Management', icon: 'account_balance' },
+        { path: '/sme/messages', label: 'Messages', icon: 'chat' },
         { path: '/sme/profile', label: 'My Profile', icon: 'person' }
       ];
     } else if (userType === 'lender') {

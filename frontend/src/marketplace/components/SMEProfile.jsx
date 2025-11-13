@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import NegotiationTab from './NegotiationTab';
+import EscrowDashboard from './EscrowDashboard';
+import PulseMonitoring from './PulseMonitoring';
 
 const SMEProfile = ({ sme, onClose, onInvest }) => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -13,6 +15,8 @@ const SMEProfile = ({ sme, onClose, onInvest }) => {
     { id: 'scores', label: 'Scores' },
     { id: 'charts', label: 'Charts' },
     { id: 'insights', label: 'AI Insights' },
+    { id: 'escrow', label: 'Escrow Management' },
+    { id: 'monitoring', label: 'Pulse Monitoring' },
     { id: 'negotiate', label: 'Negotiate' }
   ];
 
@@ -144,13 +148,26 @@ const SMEProfile = ({ sme, onClose, onInvest }) => {
                 {activeTab === 'scores' && <ScoresTab sme={sme} />}
                 {activeTab === 'charts' && <ChartsTab sme={sme} />}
                 {activeTab === 'insights' && <InsightsTab sme={sme} />}
+                {activeTab === 'escrow' && (
+                  <EscrowDashboard 
+                    loanId={`loan_${sme.id}`}
+                    smeId={sme.id}
+                    lenderId="lender_67890"
+                  />
+                )}
+                {activeTab === 'monitoring' && (
+                  <PulseMonitoring 
+                    smeId={sme.id}
+                    loanId={`loan_${sme.id}`}
+                  />
+                )}
                 {activeTab === 'negotiate' && <NegotiateTab sme={sme} />}
               </motion.div>
             </AnimatePresence>
           </div>
 
           {/* Sidebar */}
-          <div className="lg:col-span-1 flex flex-col gap-8">
+          <div className="lg:col-span-1 flex flex-col gap-6">
             <InvestmentCard onInvest={handleInvest} />
             <GrowthIndicator />
           </div>
@@ -446,17 +463,45 @@ const InsightsTab = () => (
 
 const InvestmentCard = ({ onInvest }) => (
   <motion.div 
-    className="sticky top-40 bg-white dark:bg-pulse-navy p-6 rounded-xl border border-gray-200 dark:border-gray-700 text-center"
+    className="sticky top-40 bg-white dark:bg-pulse-navy p-6 rounded-xl border border-gray-200 dark:border-gray-700"
     initial={{ opacity: 0, scale: 0.9 }}
     animate={{ opacity: 1, scale: 1 }}
     transition={{ duration: 0.5, delay: 0.3 }}
   >
-    <h3 className="text-pulse-dark dark:text-white text-lg font-bold">Ready to Make an Offer?</h3>
-    <p className="text-gray-600 dark:text-gray-300 text-sm my-3">
-      Submit a formal investment proposal. Professional negotiation starts here.
-    </p>
+    <div className="text-center mb-6">
+      <h3 className="text-pulse-dark dark:text-white text-lg font-bold mb-2">Investment Overview</h3>
+      <p className="text-gray-600 dark:text-gray-300 text-sm">
+        Secure lending with milestone-based escrow system
+      </p>
+    </div>
+
+    {/* Escrow Features */}
+    <div className="space-y-3 mb-6">
+      <div className="flex items-center gap-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+        <span className="material-symbols-outlined text-green-600 text-sm">account_balance</span>
+        <div className="text-left">
+          <p className="text-sm font-medium text-green-800 dark:text-green-200">Secure Escrow</p>
+          <p className="text-xs text-green-700 dark:text-green-300">Milestone-based releases</p>
+        </div>
+      </div>
+      <div className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+        <span className="material-symbols-outlined text-blue-600 text-sm">monitoring</span>
+        <div className="text-left">
+          <p className="text-sm font-medium text-blue-800 dark:text-blue-200">Real-time Monitoring</p>
+          <p className="text-xs text-blue-700 dark:text-blue-300">Business health tracking</p>
+        </div>
+      </div>
+      <div className="flex items-center gap-3 p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+        <span className="material-symbols-outlined text-purple-600 text-sm">chat</span>
+        <div className="text-left">
+          <p className="text-sm font-medium text-purple-800 dark:text-purple-200">Direct Communication</p>
+          <p className="text-xs text-purple-700 dark:text-purple-300">Feedback & guidance</p>
+        </div>
+      </div>
+    </div>
+
     <motion.button 
-      className="flex w-full min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-4 text-white text-base font-bold invest-button-gradient"
+      className="flex w-full min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-4 text-white text-base font-bold invest-button-gradient mb-3"
       onClick={onInvest}
       whileHover={{ scale: 1.02, boxShadow: "0 10px 25px rgba(0, 196, 180, 0.3)" }}
       whileTap={{ scale: 0.98 }}
@@ -464,6 +509,10 @@ const InvestmentCard = ({ onInvest }) => (
     >
       <span className="truncate">Make an Offer</span>
     </motion.button>
+    
+    <p className="text-xs text-gray-500 text-center">
+      Check Escrow Management & Monitoring tabs above
+    </p>
   </motion.div>
 );
 
@@ -474,25 +523,39 @@ const GrowthIndicator = () => (
     animate={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.5, delay: 0.4 }}
   >
-    <h3 className="text-pulse-dark dark:text-white text-lg font-bold mb-4">Growth Indicator</h3>
-    <div className="flex flex-col items-center">
-      <div className="flex items-baseline gap-2">
-        <motion.span 
-          className="text-4xl font-bold text-green-500 dark:text-green-400"
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: 0.5, delay: 0.6 }}
-        >
-          25%
-        </motion.span>
-        <span className="text-gray-500 dark:text-gray-400">QoQ Revenue Growth</span>
+    <h3 className="text-pulse-dark dark:text-white text-lg font-bold mb-4">Risk Assessment</h3>
+    <div className="space-y-4">
+      <div className="text-center">
+        <div className="flex items-baseline justify-center gap-2 mb-2">
+          <motion.span 
+            className="text-3xl font-bold text-green-500 dark:text-green-400"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.6 }}
+          >
+            Low
+          </motion.span>
+          <span className="text-gray-500 dark:text-gray-400">Risk Level</span>
+        </div>
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          Based on verification scores and monitoring data
+        </p>
       </div>
-      <p className="text-sm text-gray-500 dark:text-gray-400 mt-2 text-center">
-        Exceeding industry average of 15% for Q4.
-      </p>
-      <div className="mt-4 flex items-center gap-1 text-green-600 dark:text-green-400">
-        <span className="material-symbols-outlined">trending_up</span>
-        <span className="text-sm font-medium">Strong Growth Trajectory</span>
+      
+      <div className="grid grid-cols-2 gap-3 text-center">
+        <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+          <div className="text-lg font-bold text-pulse-cyan">87</div>
+          <div className="text-xs text-gray-500">Pulse Score</div>
+        </div>
+        <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+          <div className="text-lg font-bold text-pulse-pink">74</div>
+          <div className="text-xs text-gray-500">Profit Score</div>
+        </div>
+      </div>
+      
+      <div className="mt-4 flex items-center gap-1 text-green-600 dark:text-green-400 justify-center">
+        <span className="material-symbols-outlined text-sm">verified</span>
+        <span className="text-sm font-medium">Fully Verified</span>
       </div>
     </div>
   </motion.div>

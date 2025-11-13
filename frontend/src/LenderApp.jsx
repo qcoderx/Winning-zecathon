@@ -5,6 +5,7 @@ import QuickAccess from './components/QuickAccess';
 import { MarketplacePage } from './marketplace';
 import LenderDashboard from './marketplace/components/LenderDashboard';
 import LenderProfilePage from './marketplace/components/LenderProfilePage';
+import InvestmentManagement from './marketplace/components/InvestmentManagement';
 
 const LenderApp = () => {
   return (
@@ -13,10 +14,12 @@ const LenderApp = () => {
       <Breadcrumb userType="lender" />
       <Routes>
         <Route path="/dashboard" element={<LenderDashboardPage />} />
+        <Route path="/marketplace" element={<MarketplacePage />} />
         <Route path="/profile" element={<LenderProfilePage />} />
         <Route path="/applications" element={<ApplicationsPage />} />
         <Route path="/offers" element={<OffersPage />} />
         <Route path="/portfolio" element={<PortfolioPage />} />
+        <Route path="/investments/:id" element={<InvestmentManagementPage />} />
         <Route path="/" element={<LenderDashboardPage />} />
       </Routes>
     </div>
@@ -46,64 +49,120 @@ const OffersPage = () => (
   </div>
 );
 
-const PortfolioPage = () => (
-  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <h1 className="text-3xl font-bold text-pulse-navy dark:text-white mb-8">Investment Portfolio</h1>
-    
-    {/* Portfolio Stats */}
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-      <div className="bg-white dark:bg-pulse-navy rounded-xl p-6 shadow-soft text-center">
-        <div className="text-3xl font-bold text-pulse-cyan mb-2">45</div>
-        <div className="text-sm text-gray-600 dark:text-gray-400">Total Investments</div>
-      </div>
-      <div className="bg-white dark:bg-pulse-navy rounded-xl p-6 shadow-soft text-center">
-        <div className="text-3xl font-bold text-pulse-green mb-2">₦2.8B</div>
-        <div className="text-sm text-gray-600 dark:text-gray-400">Total Deployed</div>
-      </div>
-      <div className="bg-white dark:bg-pulse-navy rounded-xl p-6 shadow-soft text-center">
-        <div className="text-3xl font-bold text-pulse-pink mb-2">18.5%</div>
-        <div className="text-sm text-gray-600 dark:text-gray-400">Avg ROI</div>
-      </div>
-      <div className="bg-white dark:bg-pulse-navy rounded-xl p-6 shadow-soft text-center">
-        <div className="text-3xl font-bold text-pulse-navy dark:text-white mb-2">12</div>
-        <div className="text-sm text-gray-600 dark:text-gray-400">Active Investments</div>
-      </div>
-    </div>
+const PortfolioPage = () => {
+  const investments = [
+    { 
+      id: 1, 
+      name: 'Sade Fashion House', 
+      amount: 5000000, 
+      currentROI: 22, 
+      status: 'Active', 
+      industry: 'Fashion',
+      startDate: '2024-08-15',
+      remainingMonths: 18,
+      totalReturns: 1100000,
+      riskLevel: 'Low',
+      completedMilestones: 2,
+      totalMilestones: 4
+    },
+    { 
+      id: 2, 
+      name: 'TechFlow Solutions', 
+      amount: 8000000, 
+      currentROI: 18, 
+      status: 'Active', 
+      industry: 'FinTech',
+      startDate: '2024-06-10',
+      remainingMonths: 14,
+      totalReturns: 1440000,
+      riskLevel: 'Medium',
+      completedMilestones: 3,
+      totalMilestones: 5
+    },
+    { 
+      id: 3, 
+      name: 'Green Agro Ltd', 
+      amount: 3500000, 
+      currentROI: 25, 
+      status: 'Active', 
+      industry: 'AgriTech',
+      startDate: '2024-09-01',
+      remainingMonths: 20,
+      totalReturns: 875000,
+      riskLevel: 'Low',
+      completedMilestones: 1,
+      totalMilestones: 3
+    }
+  ];
 
-    {/* Current Investments */}
-    <div className="bg-white dark:bg-pulse-navy rounded-xl p-6 shadow-soft">
-      <h3 className="text-lg font-bold text-pulse-dark dark:text-white mb-4">Current Portfolio</h3>
-      <div className="space-y-4">
-        {[
-          { name: 'TechFlow Solutions', amount: '₦15M', roi: '22%', status: 'Performing', industry: 'FinTech' },
-          { name: 'Green Agro Ltd', amount: '₦8M', roi: '18%', status: 'Performing', industry: 'AgriTech' },
-          { name: 'HealthTech Innovations', amount: '₦12M', roi: '15%', status: 'Watch', industry: 'HealthTech' },
-          { name: 'EduLearn Platform', amount: '₦6M', roi: '25%', status: 'Performing', industry: 'EdTech' }
-        ].map((investment, index) => (
-          <div key={index} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 bg-pulse-cyan/20 rounded-lg flex items-center justify-center">
-                <span className="material-symbols-outlined text-pulse-cyan text-sm">business</span>
-              </div>
-              <div>
-                <h4 className="font-semibold text-pulse-dark dark:text-white">{investment.name}</h4>
-                <p className="text-sm text-gray-500">{investment.industry} • {investment.amount}</p>
-              </div>
-            </div>
-            <div className="text-right">
-              <div className="font-bold text-pulse-green">{investment.roi} ROI</div>
-              <span className={`text-xs px-2 py-1 rounded-full ${
-                investment.status === 'Performing' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
-              }`}>
-                {investment.status}
-              </span>
-            </div>
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <h1 className="text-3xl font-bold text-pulse-navy dark:text-white mb-8">Investment Portfolio</h1>
+      
+      {/* Portfolio Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="bg-white dark:bg-pulse-navy rounded-xl p-6 shadow-soft text-center">
+          <div className="text-3xl font-bold text-pulse-cyan mb-2">{investments.length}</div>
+          <div className="text-sm text-gray-600 dark:text-gray-400">Active Investments</div>
+        </div>
+        <div className="bg-white dark:bg-pulse-navy rounded-xl p-6 shadow-soft text-center">
+          <div className="text-3xl font-bold text-pulse-green mb-2">
+            ₦{(investments.reduce((sum, inv) => sum + inv.amount, 0) / 1000000).toFixed(1)}M
           </div>
-        ))}
+          <div className="text-sm text-gray-600 dark:text-gray-400">Total Deployed</div>
+        </div>
+        <div className="bg-white dark:bg-pulse-navy rounded-xl p-6 shadow-soft text-center">
+          <div className="text-3xl font-bold text-pulse-pink mb-2">
+            {(investments.reduce((sum, inv) => sum + inv.currentROI, 0) / investments.length).toFixed(1)}%
+          </div>
+          <div className="text-sm text-gray-600 dark:text-gray-400">Avg ROI</div>
+        </div>
+        <div className="bg-white dark:bg-pulse-navy rounded-xl p-6 shadow-soft text-center">
+          <div className="text-3xl font-bold text-pulse-navy dark:text-white mb-2">
+            ₦{(investments.reduce((sum, inv) => sum + inv.totalReturns, 0) / 1000000).toFixed(1)}M
+          </div>
+          <div className="text-sm text-gray-600 dark:text-gray-400">Total Returns</div>
+        </div>
+      </div>
+
+      {/* Current Investments */}
+      <div className="bg-white dark:bg-pulse-navy rounded-xl p-6 shadow-soft">
+        <h3 className="text-lg font-bold text-pulse-dark dark:text-white mb-4">Active Investments</h3>
+        <div className="space-y-4">
+          {investments.map((investment) => (
+            <div key={investment.id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                 onClick={() => window.location.href = `/lender/investments/${investment.id}`}>
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-pulse-cyan/20 rounded-lg flex items-center justify-center">
+                  <span className="material-symbols-outlined text-pulse-cyan">business</span>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-pulse-dark dark:text-white">{investment.name}</h4>
+                  <p className="text-sm text-gray-500">
+                    {investment.industry} • ₦{(investment.amount / 1000000).toFixed(1)}M • {investment.remainingMonths} months left
+                  </p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded-full">
+                      {investment.status}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      {investment.completedMilestones}/{investment.totalMilestones} milestones
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="font-bold text-pulse-green text-lg">{investment.currentROI}% ROI</div>
+                <div className="text-sm text-gray-500">₦{(investment.totalReturns / 1000).toFixed(0)}K returns</div>
+                <div className="text-xs text-pulse-cyan mt-1">Click to manage →</div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 // Lender Dashboard Page
 const LenderDashboardPage = () => (
@@ -183,5 +242,33 @@ const LenderDashboardPage = () => (
     </div>
   </div>
 );
+
+// Investment Management Page
+const InvestmentManagementPage = () => {
+  // Mock investment data - in real app, fetch based on route params
+  const investment = {
+    id: 1,
+    smeName: 'Sade Fashion House',
+    smeId: 'sme_12345',
+    lenderId: 'lender_67890',
+    loanId: 'loan_12345',
+    industry: 'Fashion',
+    location: 'Lagos Island, Lagos',
+    amount: 5000000,
+    currentROI: 22,
+    totalReturns: 1100000,
+    riskLevel: 'Low',
+    startDate: '2024-08-15',
+    remainingMonths: 18,
+    completedMilestones: 2,
+    totalMilestones: 4
+  };
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <InvestmentManagement investment={investment} />
+    </div>
+  );
+};
 
 export default LenderApp;

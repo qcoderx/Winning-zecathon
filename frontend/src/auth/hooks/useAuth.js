@@ -23,19 +23,36 @@ export const useAuth = () => {
     try {
       await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate network delay
       
-      // Mock successful login for any valid email/password
-      const mockUser = {
-        id: '1',
+      // Mock successful login based on user type
+      const mockUser = formData.userType === 'sme' ? {
+        id: 'sme_1',
+        firstName: 'Sade',
+        lastName: 'Adebayo',
+        businessName: 'Sade Fashion House',
+        email: formData.email,
+        userType: 'sme',
+        verificationStatus: 'pending', // 'pending', 'processing', 'verified'
+        pulseScore: null,
+        profitScore: null
+      } : {
+        id: 'lender_1',
         name: 'Alex Morgan',
         email: formData.email,
-        user_type: 'lender'
+        userType: 'lender'
       };
       
-      const mockToken = 'mock_jwt_token_' + Date.now();
+      const mockToken = `mock_jwt_token_${formData.userType}_` + Date.now();
       
-      localStorage.setItem('token', mockToken);
-      localStorage.setItem('user', JSON.stringify(mockUser));
-      setMessage('Login successful! Redirecting to marketplace...');
+      // Store tokens based on user type
+      if (formData.userType === 'sme') {
+        localStorage.setItem('sme_token', mockToken);
+        localStorage.setItem('sme_user', JSON.stringify(mockUser));
+      } else {
+        localStorage.setItem('token', mockToken);
+        localStorage.setItem('user', JSON.stringify(mockUser));
+      }
+      
+      setMessage(`Login successful! Redirecting to ${formData.userType === 'sme' ? 'dashboard' : 'marketplace'}...`);
       
       return { success: true, data: { token: mockToken, user: mockUser } };
     } catch (error) {
@@ -61,9 +78,10 @@ export const useAuth = () => {
     try {
       await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate network delay
       
-      // Mock successful registration
-      setMessage('Account created successfully! Please login to continue.');
-      return { success: true, data: { message: 'Registration successful' } };
+      // Mock successful registration based on user type
+      const userType = formData.userType || 'lender';
+      setMessage(`${userType.toUpperCase()} account created successfully! Please login to continue.`);
+      return { success: true, data: { message: 'Registration successful', userType } };
     } catch (error) {
       setErrors({ general: 'Network error. Please try again.' });
       return { success: false };

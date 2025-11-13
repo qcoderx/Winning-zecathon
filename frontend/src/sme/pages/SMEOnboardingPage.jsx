@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { PulsefiLogo } from '../../components/LoadingScreen';
 import OnboardingWizard from '../components/OnboardingWizard';
 
-const SMEOnboardingPage = ({ onComplete }) => {
+const SMEOnboardingPage = ({ onComplete, user }) => {
   const [isCompleted, setIsCompleted] = useState(false);
   const [submittedData, setSubmittedData] = useState(null);
 
@@ -123,7 +123,7 @@ const SMEOnboardingPage = ({ onComplete }) => {
       </motion.header>
 
       {/* Main Content */}
-      <OnboardingWizard onComplete={handleOnboardingComplete} />
+      <OnboardingWizard onComplete={handleOnboardingComplete} user={user} />
     </div>
   );
 };
