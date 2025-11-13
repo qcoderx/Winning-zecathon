@@ -6,17 +6,22 @@ from django.utils import timezone
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from django.db import transaction as db_transaction
-from .models import LoanApplication, EscrowAccount, Transaction, RepaymentSchedule, Disbursement
+from .models import (
+    LoanApplication, EscrowAccount, Transaction, 
+    RepaymentSchedule, Disbursement, LoanNegotiation
+)
 from .serializers import (
     LoanApplicationSerializer, LoanApplicationCreateSerializer,
     EscrowAccountSerializer, TransactionSerializer,
     RepaymentScheduleSerializer, DisbursementSerializer,
     FundEscrowSerializer, InitiateDisbursementSerializer, 
-    MakeRepaymentSerializer, VerifyFundingSerializer, LoanApplicationStatusSerializer
+    MakeRepaymentSerializer, VerifyFundingSerializer, LoanApplicationStatusSerializer,
+    LoanNegotiationSerializer, SMECounterOfferSerializer # <-- NEW
 )
 from .services import EscrowService, PaymentGatewayService
 from sme.models import BusinessProfile
 from django.db.models import Sum
+from rest_framework.exceptions import PermissionDenied # <-- NEW
 
 class LoanApplicationViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
@@ -27,7 +32,11 @@ class LoanApplicationViewSet(viewsets.ModelViewSet):
         if user.user_type == 'sme':
             return LoanApplication.objects.filter(sme_business__user=user)
         elif user.user_type == 'lender':
-            return LoanApplication.objects.filter(lender__user=user)
+            # Lenders can see applications they are assigned to OR public submitted ones
+            return LoanApplication.objects.filter(
+                models.Q(lender__user=user) | 
+                models.Q(status='submitted', lender__isnull=True)
+            ).distinct()
         else:
             return LoanApplication.objects.none()
     
@@ -52,22 +61,19 @@ class LoanApplicationViewSet(viewsets.ModelViewSet):
                     status=status.HTTP_400_BAD_REQUEST
                 )
             
-            loan_application = serializer.save(sme_business=sme_business, status='submitted')
-            
-            # NOTE: Removed automatic escrow creation here.
-            # Escrow account creation should typically happen upon approval/funding initialization,
-            # not immediately upon submission, to avoid the UNIQUE constraint error 
-            # when the test explicitly calls it later.
+            # SME creates an application, status is 'submitted' (or 'draft' if you prefer)
+            # Lender is initially null
+            loan_application = serializer.save(sme_business=sme_business, status='submitted', lender=None)
             
             # Return the created instance
             return loan_application
         
+        # Lenders can no longer create applications this way
         elif user.user_type == 'lender':
-            lender_profile = get_object_or_404(user.lender_profile)
-            loan_application = serializer.save(lender=lender_profile, status='draft')
-            
-            # Return the created instance
-            return loan_application
+             return Response(
+                {"error": "Lenders cannot create loan applications."},
+                status=status.HTTP_403_FORBIDDEN
+            )
         
         return None
     
@@ -93,6 +99,50 @@ class LoanApplicationViewSet(viewsets.ModelViewSet):
             
         # Fallback if result is None (should be caught by returning a Response earlier, but for safety)
         return Response({"detail": "Application creation failed unexpectedly."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    # --- SME Pitch to Lender ---
+    @action(detail=True, methods=['post'], url_path='pitch-to-lender')
+    def pitch_to_lender(self, request, pk=None):
+        """SME pitches their application to a specific lender"""
+        loan_application = self.get_object()
+        
+        # 1. Check if user is the SME owner
+        if request.user != loan_application.sme_business.user:
+            return Response(
+                {"error": "You can only pitch your own applications."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+            
+        # 2. Check if application is in a pitch-able state
+        if loan_application.status != 'draft' or loan_application.lender is not None:
+            return Response(
+                {"error": "Application must be a draft and have no lender assigned."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+        # 3. Get lender from request
+        lender_id = request.data.get('lender_id')
+        if not lender_id:
+            return Response({"error": "lender_id is required."}, status=status.HTTP_400_BAD_REQUEST)
+            
+        try:
+            from lender.models import LenderProfile
+            lender = LenderProfile.objects.get(id=lender_id)
+        except LenderProfile.DoesNotExist:
+            return Response({"error": "Lender not found."}, status=status.HTTP_404_NOT_FOUND)
+            
+        # 4. Assign lender and update status
+        loan_application.lender = lender
+        loan_application.status = 'submitted'
+        loan_application.save()
+        
+        # You could also create a notification for the lender here
+        
+        return Response(
+            {"message": f"Successfully pitched to {lender.company_name}."},
+            status=status.HTTP_200_OK
+        )
+
     
     @action(detail=True, methods=['post'], serializer_class=FundEscrowSerializer)
     def initialize_funding(self, request, pk=None):
@@ -230,30 +280,14 @@ class LoanApplicationViewSet(viewsets.ModelViewSet):
     
     @action(detail=True, methods=['post'])
     def approve_application(self, request, pk=None):
-        """Approve a loan application (Lender only)"""
-        loan_application = self.get_object()
-        
-        if request.user != loan_application.lender.user:
-            return Response(
-                {"error": "Only the assigned lender can approve this application"},
-                status=status.HTTP_403_FORBIDDEN
-            )
-        
-        if loan_application.status != 'submitted':
-            return Response(
-                {"error": "Only submitted applications can be approved"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        loan_application.status = 'approved'
-        loan_application.approval_date = timezone.now()
-        loan_application.save()
-        
-        return Response({
-            "message": "Loan application approved successfully",
-            "status": loan_application.status,
-            "approval_date": loan_application.approval_date
-        }, status=status.HTTP_200_OK)
+        """
+        Approve a loan application (Lender only)
+        DEPRECATED: Use the negotiation workflow instead.
+        """
+        return Response(
+            {"error": "This action is deprecated. Please use the negotiation system to accept an offer."},
+            status=status.HTTP_405_METHOD_NOT_ALLOWED
+        )
     
     @action(detail=True, methods=['post'])
     def reject_application(self, request, pk=None):
@@ -429,3 +463,191 @@ class LenderEscrowViewSet(viewsets.ViewSet):
             'total_amount_lent': float(total_amount_lent),  # Convert Decimal to float for JSON
             'recent_transactions': TransactionSerializer(recent_transactions, many=True).data
         })
+
+
+# --- NEW VIEWSET ---
+class LoanNegotiationViewSet(viewsets.ModelViewSet):
+    """
+    Manages negotiations for a specific Loan Application.
+    /api/escrow/loan-applications/<loan_pk>/negotiations/
+    """
+    permission_classes = [IsAuthenticated]
+    
+    def get_serializer_class(self):
+        if self.action == 'counter_offer':
+            return SMECounterOfferSerializer
+        return LoanNegotiationSerializer
+
+    def get_loan_application(self):
+        """Get parent LoanApplication from URL"""
+        loan_pk = self.kwargs['loan_application_pk']
+        return get_object_or_404(LoanApplication, pk=loan_pk)
+
+    def get_queryset(self):
+        """Return all negotiations for the given loan"""
+        loan_application = self.get_loan_application()
+        return loan_application.negotiations.all().order_by('created_at')
+
+    def get_serializer_context(self):
+        """Pass request and loan_app to serializer"""
+        return {
+            'request': self.request,
+            'loan_application': self.get_loan_application()
+        }
+
+    def perform_create(self, serializer):
+        """Lender creates a new offer"""
+        loan_application = self.get_loan_application()
+        
+        if self.request.user.user_type != 'lender':
+            raise PermissionDenied("Only lenders can make offers.")
+            
+        serializer.save(
+            user=self.request.user, 
+            loan_application=loan_application
+        )
+
+    @action(detail=True, methods=['post'], url_path='sme-accept')
+    @db_transaction.atomic
+    def accept_offer(self, request, pk=None, loan_application_pk=None):
+        """SME accepts a LENDER's offer"""
+        offer = self.get_object()
+        loan_application = offer.loan_application
+        
+        # 1. Check if user is the SME owner
+        if request.user != loan_application.sme_business.user:
+            raise PermissionDenied("You do not have permission to accept this offer.")
+        
+        # 2. Check if offer is from a Lender
+        if offer.user.user_type != 'lender':
+            return Response(
+                {"error": "You can only accept offers from a lender."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+        if offer.status != 'pending':
+            return Response(
+                {"error": "This offer is no longer pending."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # 3. Update Loan Application
+        loan_application.lender = offer.user.lender_profile # Assign lender
+        loan_application.negotiated_rate = offer.proposed_rate
+        loan_application.status = 'approved' # Mark as approved
+        loan_application.approval_date = timezone.now()
+        loan_application.save()
+        
+        # 4. Update this offer
+        offer.status = 'accepted'
+        offer.save()
+        
+        # 5. Reject all other pending offers for this loan
+        loan_application.negotiations.filter(
+            status='pending'
+        ).update(status='rejected')
+        
+        return Response(
+            {"message": "Offer accepted. Loan approved."},
+            status=status.HTTP_200_OK
+        )
+
+    @action(detail=True, methods=['post'], url_path='sme-reject')
+    def reject_offer(self, request, pk=None, loan_application_pk=None):
+        """SME rejects a LENDER's offer"""
+        offer = self.get_object()
+        loan_application = offer.loan_application
+        
+        if request.user != loan_application.sme_business.user:
+            raise PermissionDenied("You do not have permission to reject this offer.")
+        
+        if offer.user.user_type != 'lender':
+            return Response({"error": "You can only reject offers from a lender."}, status=status.HTTP_400_BAD_REQUEST)
+
+        offer.status = 'rejected'
+        offer.save()
+        
+        return Response({"message": "Offer rejected."}, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['post'], url_path='sme-counter')
+    @db_transaction.atomic
+    def counter_offer(self, request, pk=None, loan_application_pk=None):
+        """SME makes a counter-offer to a LENDER's offer"""
+        original_offer = self.get_object()
+        loan_application = original_offer.loan_application
+        
+        if request.user != loan_application.sme_business.user:
+            raise PermissionDenied("Only the SME can make a counter-offer.")
+
+        if original_offer.status != 'pending' or original_offer.user.user_type != 'lender':
+            return Response(
+                {"error": "Can only counter a pending offer from a lender."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+        serializer = SMECounterOfferSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        # 1. Mark original offer as countered
+        original_offer.status = 'countered'
+        original_offer.save()
+        
+        # 2. Create a new 'pending' offer from the SME
+        new_offer = LoanNegotiation.objects.create(
+            loan_application=loan_application,
+            user=request.user,
+            proposed_rate=serializer.validated_data['proposed_rate'],
+            message=serializer.validated_data.get('message', ''),
+            status='pending' # This is now a pending offer for the LENDER to accept
+        )
+        
+        return Response(
+            LoanNegotiationSerializer(new_offer).data, 
+            status=status.HTTP_201_CREATED
+        )
+
+    @action(detail=True, methods=['post'], url_path='lender-accept')
+    @db_transaction.atomic
+    def lender_accept_offer(self, request, pk=None, loan_application_pk=None):
+        """LENDER accepts an SME's counter-offer"""
+        offer = self.get_object()
+        loan_application = offer.loan_application
+        
+        # 1. Check if user is a Lender
+        if request.user.user_type != 'lender':
+            raise PermissionDenied("Only lenders can accept this offer.")
+        
+        # 2. Check if offer is from the SME
+        if offer.user != loan_application.sme_business.user:
+            return Response(
+                {"error": "You can only accept offers from the SME."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+        if offer.status != 'pending':
+            return Response(
+                {"error": "This offer is no longer pending."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # 3. Update Loan Application
+        loan_application.lender = request.user.lender_profile # Assign *this* lender
+        loan_application.negotiated_rate = offer.proposed_rate
+        loan_application.status = 'approved' # Mark as approved
+        loan_application.approval_date = timezone.now()
+        loan_application.save()
+        
+        # 4. Update this offer
+        offer.status = 'accepted'
+        offer.save()
+        
+        # 5. Reject all other pending offers for this loan
+        loan_application.negotiations.filter(
+            status='pending'
+        ).update(status='rejected')
+        
+        return Response(
+            {"message": "Counter-offer accepted. Loan approved."},
+            status=status.HTTP_200_OK
+        )
+# -----------------

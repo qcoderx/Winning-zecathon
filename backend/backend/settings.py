@@ -58,12 +58,12 @@ CSRF_TRUSTED_ORIGINS = [
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
+    # Our Apps
+    'core',
+    'users',
+    'sme',
+    'lender',
+    'escrow',
 
     # 3rd Party Apps
     'rest_framework',
@@ -71,15 +71,14 @@ INSTALLED_APPS = [
     'corsheaders',
     'drf_spectacular',
 
-    # Our Apps
-    'core',
-    'users',
-    'sme',
-    'lender',
-    'utils', # Added utils just in case
-    'escrow'
+    # Django Apps
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
 ]
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware', # <-- ADD THIS for static files

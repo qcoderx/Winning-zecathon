@@ -1,7 +1,11 @@
 from rest_framework import serializers
-from .models import LoanApplication, EscrowAccount, Transaction, RepaymentSchedule, Disbursement
+from .models import (
+    LoanApplication, EscrowAccount, Transaction, 
+    RepaymentSchedule, Disbursement, LoanNegotiation
+)
 from sme.serializers import BusinessProfileSerializer
 from lender.serializers import LenderProfileSerializer
+from users.serializers import UserSerializer # <-- IMPORT USER SERIALIZER
 
 class LoanApplicationSerializer(serializers.ModelSerializer):
     sme_business = BusinessProfileSerializer(read_only=True)
@@ -16,6 +20,7 @@ class LoanApplicationSerializer(serializers.ModelSerializer):
         model = LoanApplication
         fields = [
             'id', 'sme_business', 'lender', 'loan_amount', 'interest_rate',
+            'negotiated_rate', # <-- ADD NEGOTIATED RATE
             'tenure_months', 'purpose', 'repayment_frequency', 'repayment_frequency_display',
             'status', 'status_display', 'application_date', 'approval_date',
             'disbursement_date', 'completion_date', 'risk_score', 'loan_to_value_ratio',
@@ -23,7 +28,8 @@ class LoanApplicationSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = [
             'status', 'application_date', 'approval_date', 'disbursement_date',
-            'completion_date', 'risk_score', 'loan_to_value_ratio', 'created_at', 'updated_at'
+            'completion_date', 'risk_score', 'loan_to_value_ratio', 'created_at', 'updated_at',
+            'negotiated_rate' # <-- ADD HERE
         ]
     
     def get_escrow_account(self, obj):
@@ -44,7 +50,8 @@ class LoanApplicationCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = LoanApplication
         fields = [
-            'sme_business', 'loan_amount', 'interest_rate', 'tenure_months',
+            # 'sme_business', # SME business is set from the request user, not the payload
+            'loan_amount', 'interest_rate', 'tenure_months',
             'purpose', 'repayment_frequency'
         ]
     
@@ -181,3 +188,43 @@ class EscrowDashboardSerializer(serializers.Serializer):
     pending_loans = serializers.IntegerField()
     total_amount_lent = serializers.DecimalField(max_digits=15, decimal_places=2)
     recent_transactions = TransactionSerializer(many=True)
+
+
+# --- NEW SERIALIZERS ---
+class LoanNegotiationSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    
+    class Meta:
+        model = LoanNegotiation
+        fields = [
+            'id', 'loan_application', 'user', 'proposed_rate', 
+            'message', 'status', 'created_at'
+        ]
+        read_only_fields = ['id', 'loan_application', 'user', 'status', 'created_at']
+
+    def create(self, validated_data):
+        request = self.context['request']
+        loan_application = self.context['loan_application']
+        
+        # Only lenders can make new 'pending' offers
+        if request.user.user_type != 'lender':
+            raise serializers.ValidationError("Only lenders can make offers.")
+        
+        offer = LoanNegotiation.objects.create(
+            loan_application=loan_application,
+            user=request.user,
+            **validated_data
+        )
+        
+        # Update loan status to show negotiation is active
+        if loan_application.status in ['draft', 'submitted']:
+            loan_application.status = 'under_review'
+            loan_application.save()
+        
+        return offer
+
+class SMECounterOfferSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LoanNegotiation
+        fields = ['proposed_rate', 'message']
+# -----------------------

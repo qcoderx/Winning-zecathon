@@ -22,14 +22,32 @@ class LoanApplication(models.Model):
         'lender.LenderProfile', 
         on_delete=models.SET_NULL, # Use SET_NULL or similar appropriate strategy
         related_name='applications_received',
-        null=True # <--- THIS IS THE REQUIRED FIX
+        null=True,
+        blank=True # <-- Make blank=True to allow SME to submit without a lender
     )
     
     # Loan details
     loan_amount = models.DecimalField(max_digits=12, decimal_places=2, validators=[MinValueValidator(0)])
-    interest_rate = models.DecimalField(max_digits=5, decimal_places=2, validators=[MinValueValidator(0)])
+    # This is the SME's *initial* asking rate
+    interest_rate = models.DecimalField(
+        max_digits=5, 
+        decimal_places=2, 
+        validators=[MinValueValidator(0)],
+        help_text="SME's initial asking rate"
+    )
     tenure_months = models.IntegerField(validators=[MinValueValidator(1)])
     purpose = models.TextField()
+    
+    # --- NEW FIELD ---
+    # This will be the *final* rate after negotiation
+    negotiated_rate = models.DecimalField(
+        max_digits=5, 
+        decimal_places=2, 
+        validators=[MinValueValidator(0)], 
+        null=True, 
+        blank=True
+    )
+    # -----------------
     
     # Repayment schedule
     repayment_frequency = models.CharField(
@@ -181,3 +199,48 @@ class Disbursement(models.Model):
     
     def __str__(self):
         return f"Disbursement - {self.loan_application} - ₦{self.amount}"
+
+
+# --- NEW MODEL ---
+class LoanNegotiation(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),   # Offer is waiting for a response
+        ('accepted', 'Accepted'), # Offer was accepted
+        ('rejected', 'Rejected'), # Offer was rejected
+        ('countered', 'Countered'), # Offer was countered by the SME
+    ]
+    
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    loan_application = models.ForeignKey(
+        LoanApplication, 
+        on_delete=models.CASCADE, 
+        related_name='negotiations'
+    )
+    # The user making the offer (could be a lender OR an SME countering)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, 
+        on_delete=models.CASCADE, 
+        related_name='loan_offers'
+    )
+    
+    proposed_rate = models.DecimalField(
+        max_digits=5, 
+        decimal_places=2, 
+        validators=[MinValueValidator(0)]
+    )
+    
+    # You could also add proposed_amount, proposed_tenure if you want to negotiate those
+    
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    message = models.TextField(blank=True, help_text="A short message for the offer")
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['created_at']
+        db_table = 'escrow_loan_negotiations'
+    
+    def __str__(self):
+        return f"Offer from {self.user.email} on {self.loan_application.id} for {self.proposed_rate}%"
+# -----------------
