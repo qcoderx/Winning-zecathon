@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 from datetime import timedelta
-import os
+import os  # <-- Make sure this is imported
 from dotenv import load_dotenv
 import dj_database_url
 
@@ -32,7 +32,27 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-6e+w)am%-9gr%!d%_#jvru@o8y
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = []
+
+# --- FIX for Render Deployment ---
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    'localhost',
+    'pulsefi-185q.onrender.com', # <-- ADD THIS LINE
+]
+
+# Keep the dynamic Render hostname for pull requests/previews
+RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+
+# --- PROACTIVE FIX FOR POST REQUESTS ---
+# Add this section to allow POST requests from your domain
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:3000', # For local frontend dev
+    'http://127.0.0.1:3000',
+    'https://pulsefi-185q.onrender.com', # <-- ADD THIS LINE
+]
+# --- END OF FIX ---
 
 
 # Application definition
@@ -57,10 +77,12 @@ INSTALLED_APPS = [
     'sme',
     'lender',
     'utils', # Added utils just in case
+    'escrow'
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware', # <-- ADD THIS for static files
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware', # CORS Middleware
     'django.middleware.common.CommonMiddleware',
@@ -155,6 +177,16 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 
+# --- ADD THIS SECTION for Production Static Files ---
+if not DEBUG:
+    # Tell Django to copy static assets into a path called "staticfiles"
+    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+    # Enable WhiteNoise storage
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# --- END OF SECTION ---
+
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
@@ -195,3 +227,23 @@ GOOGLE_AI_API_KEY = os.getenv('GOOGLE_AI_API_KEY')
 # Mono Configuration
 MONO_SECRET_KEY = os.getenv('MONO_SECRET_KEY')
 MONO_BASE_URL = 'https://api.withmono.com'
+
+# Paystack Configuration
+PAYSTACK_SECRET_KEY = os.getenv('PAYSTACK_SECRET_KEY', 'sk_test_...')
+PAYSTACK_PUBLIC_KEY = os.getenv('PAYSTACK_PUBLIC_KEY', 'pk_test_...')
+PAYSTACK_CALLBACK_URL = os.getenv('PAYSTACK_CALLBACK_URL', 'https://yourdomain.com/api/escrow/webhook/')
+
+
+# --- ADDED THIS SECTION ---
+# DRF-Spectacular Settings
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'PulseFI API',
+    'DESCRIPTION': 'API for the PulseFI SME Lending Platform',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': True, # Set to True to see the schema file
+    # This PATTERNS list tells spectacular to ONLY scan URLs under 'api/'
+    # This fixes the operationId collision warnings.
+    'PATTERNS': [
+        r'^api/',
+    ],
+}

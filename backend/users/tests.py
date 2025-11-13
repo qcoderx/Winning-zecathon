@@ -1,60 +1,88 @@
 from django.test import TestCase
+from django.urls import reverse
+from rest_framework.test import APITestCase
+from rest_framework import status
 from django.contrib.auth import get_user_model
-from sme.models import BusinessProfile, CACDocument, BusinessVideo
-from .services import PulseEngine
+from .models import User
 
 User = get_user_model()
 
-class PulseEngineTests(TestCase):
-    def setUp(self):
-        """Set up test data for PulseEngine"""
-        self.user = User.objects.create_user(
-            email='test@example.com',
+class UserRegistrationTests(APITestCase):
+    def test_sme_registration(self):
+        """Test SME user registration"""
+        url = reverse('sme-register')
+        data = {
+            'email': 'sme@example.com',
+            'password': 'testpass123',
+            'user_type': 'sme',
+            'business_name': 'Test SME',
+            'phone_number': '+2341234567890'
+        }
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(User.objects.count(), 1)
+        self.assertEqual(User.objects.get().user_type, 'sme')
+
+    def test_lender_registration(self):
+        """Test Lender user registration"""
+        url = reverse('lender-register')
+        data = {
+            'email': 'lender@example.com',
+            'password': 'testpass123',
+            'user_type': 'lender',
+            'company_name': 'Test Lender Corp',
+            'phone_number': '+2341234567890'
+        }
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(User.objects.count(), 1)
+        self.assertEqual(User.objects.get().user_type, 'lender')
+
+    def test_login_sme(self):
+        """Test SME login"""
+        # Create user
+        user = User.objects.create_user(
+            email='sme@example.com',
             password='testpass123',
             user_type='sme'
         )
-        self.business_profile = BusinessProfile.objects.create(
-            user=self.user,
-            business_name='Test Business Ltd',
-            industry='Technology'
+        url = reverse('login')
+        data = {
+            'email': 'sme@example.com',
+            'password': 'testpass123',
+            'user_type': 'sme'
+        }
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('token', response.data)
+        self.assertEqual(response.data['user']['user_type'], 'sme')
+
+    def test_login_lender(self):
+        """Test Lender login"""
+        # Create user
+        user = User.objects.create_user(
+            email='lender@example.com',
+            password='testpass123',
+            user_type='lender'
         )
+        url = reverse('login')
+        data = {
+            'email': 'lender@example.com',
+            'password': 'testpass123',
+            'user_type': 'lender'
+        }
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('token', response.data)
+        self.assertEqual(response.data['user']['user_type'], 'lender')
 
-    def test_pulse_engine_missing_profile(self):
-        """Test PulseEngine with missing business profile"""
-        # Delete the profile
-        self.business_profile.delete()
-
-        engine = PulseEngine(self.user, 'Test Bank Account')
-        score, reason = engine.run_verification()
-        self.assertEqual(score, 0)
-        self.assertIn('Business Profile is missing', reason)
-
-    def test_pulse_engine_missing_documents(self):
-        """Test PulseEngine with missing CAC and video documents"""
-        engine = PulseEngine(self.user, 'Test Bank Account')
-        score, reason = engine.run_verification()
-        # Should have penalties for missing CAC and video
-        self.assertLess(score, 100)
-        self.assertIn('CAC document missing', reason)
-        self.assertIn('Business Video missing', reason)
-
-    def test_pulse_engine_bank_name_match(self):
-        """Test bank name matching"""
-        # Matching bank name
-        engine = PulseEngine(self.user, 'Test Business Ltd')
-        score, reason = engine.run_verification()
-        # Should get points for bank match, but lose for missing docs
-        self.assertGreaterEqual(score, 0)
-
-        # Non-matching bank name
-        engine2 = PulseEngine(self.user, 'Different Bank Name')
-        score2, reason2 = engine2.run_verification()
-        self.assertLessEqual(score2, score)  # Should have lower or equal score
-
-    def test_pulse_engine_initialization(self):
-        """Test PulseEngine initialization"""
-        engine = PulseEngine(self.user, 'Test Bank')
-        self.assertEqual(engine.user, self.user)
-        self.assertEqual(engine.bank_account_name, 'Test Bank')
-        self.assertEqual(engine.score, 0)
-        self.assertEqual(engine.fail_reasons, [])
+    def test_invalid_login(self):
+        """Test invalid login credentials"""
+        url = reverse('login')
+        data = {
+            'email': 'nonexistent@example.com',
+            'password': 'wrongpass',
+            'user_type': 'sme'
+        }
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
