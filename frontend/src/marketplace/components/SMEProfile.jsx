@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import NegotiationTab from './NegotiationTab';
 
 const SMEProfile = ({ sme, onClose, onInvest }) => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -11,11 +12,13 @@ const SMEProfile = ({ sme, onClose, onInvest }) => {
     { id: 'overview', label: 'Overview' },
     { id: 'scores', label: 'Scores' },
     { id: 'charts', label: 'Charts' },
-    { id: 'insights', label: 'AI Insights' }
+    { id: 'insights', label: 'AI Insights' },
+    { id: 'negotiate', label: 'Negotiate' }
   ];
 
   const handleInvest = () => {
-    setShowInvestModal(true);
+    // Scroll to negotiate tab instead of showing modal
+    setActiveTab('negotiate');
   };
 
   const confirmInvestment = () => {
@@ -141,6 +144,7 @@ const SMEProfile = ({ sme, onClose, onInvest }) => {
                 {activeTab === 'scores' && <ScoresTab sme={sme} />}
                 {activeTab === 'charts' && <ChartsTab sme={sme} />}
                 {activeTab === 'insights' && <InsightsTab sme={sme} />}
+                {activeTab === 'negotiate' && <NegotiateTab sme={sme} />}
               </motion.div>
             </AnimatePresence>
           </div>
@@ -208,13 +212,59 @@ const ScoreCircle = ({ label, score, color }) => {
 // Tab Components
 const OverviewTab = ({ sme }) => (
   <div className="space-y-8">
+    {/* Loan Application Details */}
     <motion.div 
-      className="bg-white dark:bg-pulse-navy p-6 rounded-xl border border-gray-200 dark:border-gray-700"
+      className="bg-gradient-to-r from-pulse-cyan/10 to-pulse-pink/10 dark:from-pulse-cyan/20 dark:to-pulse-pink/20 p-6 rounded-xl border border-pulse-cyan/20 dark:border-pulse-cyan/30"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <h2 className="text-pulse-dark dark:text-white text-xl font-bold mb-4">Overview</h2>
+      <h2 className="text-pulse-dark dark:text-white text-xl font-bold mb-4 flex items-center gap-2">
+        <span className="material-symbols-outlined text-pulse-cyan">request_quote</span>
+        Funding Request
+      </h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="text-center">
+          <div className="text-3xl font-bold text-pulse-cyan mb-1">
+            ₦{(sme.loanAmount || 2500000).toLocaleString()}
+          </div>
+          <div className="text-sm text-gray-600 dark:text-gray-400">Loan Amount Requested</div>
+        </div>
+        <div className="text-center">
+          <div className="text-3xl font-bold text-pulse-pink mb-1">
+            {sme.interestRate || 15}%
+          </div>
+          <div className="text-sm text-gray-600 dark:text-gray-400">Asking Interest Rate</div>
+        </div>
+        <div className="text-center">
+          <div className="text-3xl font-bold text-pulse-green mb-1">
+            {sme.tenureMonths || 24}
+          </div>
+          <div className="text-sm text-gray-600 dark:text-gray-400">Tenure (months)</div>
+        </div>
+        <div className="text-center">
+          <div className="text-3xl font-bold text-pulse-navy dark:text-white mb-1">
+            ₦{Math.round(((sme.loanAmount || 2500000) * (1 + (sme.interestRate || 15)/100)) / (sme.tenureMonths || 24)).toLocaleString()}
+          </div>
+          <div className="text-sm text-gray-600 dark:text-gray-400">Monthly Payment</div>
+        </div>
+      </div>
+      <div className="mt-6 p-4 bg-white/50 dark:bg-gray-800/50 rounded-lg">
+        <h3 className="font-semibold text-gray-700 dark:text-gray-300 mb-2">Purpose</h3>
+        <p className="text-gray-600 dark:text-gray-300">
+          {sme.purpose || "Expanding inventory and working capital to meet growing customer demand in the retail sector. This funding will enable us to stock premium products and improve our supply chain efficiency."}
+        </p>
+      </div>
+    </motion.div>
+
+    {/* Business Summary */}
+    <motion.div 
+      className="bg-white dark:bg-pulse-navy p-6 rounded-xl border border-gray-200 dark:border-gray-700"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: 0.1 }}
+    >
+      <h2 className="text-pulse-dark dark:text-white text-xl font-bold mb-4">Business Overview</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-4">
           <h3 className="font-semibold text-gray-700 dark:text-gray-300">Business Summary</h3>
@@ -229,7 +279,7 @@ const OverviewTab = ({ sme }) => (
               <span className="material-symbols-outlined text-xl text-gray-400 dark:text-gray-500 mt-0.5">person</span>
               <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">Founder & CEO</p>
-                <p className="font-medium text-pulse-dark dark:text-gray-200">John Doe</p>
+                <p className="font-medium text-pulse-dark dark:text-gray-200">{sme.founder || 'John Doe'}</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
@@ -237,6 +287,13 @@ const OverviewTab = ({ sme }) => (
               <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">Location</p>
                 <p className="font-medium text-pulse-dark dark:text-gray-200">{sme.location}</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <span className="material-symbols-outlined text-xl text-gray-400 dark:text-gray-500 mt-0.5">calendar_today</span>
+              <div>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Years in Business</p>
+                <p className="font-medium text-pulse-dark dark:text-gray-200">{sme.yearsInBusiness || '3 years'}</p>
               </div>
             </div>
           </div>
@@ -394,9 +451,9 @@ const InvestmentCard = ({ onInvest }) => (
     animate={{ opacity: 1, scale: 1 }}
     transition={{ duration: 0.5, delay: 0.3 }}
   >
-    <h3 className="text-pulse-dark dark:text-white text-lg font-bold">Ready to Invest?</h3>
+    <h3 className="text-pulse-dark dark:text-white text-lg font-bold">Ready to Make an Offer?</h3>
     <p className="text-gray-600 dark:text-gray-300 text-sm my-3">
-      Become a part of this company's journey. This investment opportunity closes in 15 days.
+      Submit a formal investment proposal. Professional negotiation starts here.
     </p>
     <motion.button 
       className="flex w-full min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-4 text-white text-base font-bold invest-button-gradient"
@@ -405,7 +462,7 @@ const InvestmentCard = ({ onInvest }) => (
       whileTap={{ scale: 0.98 }}
       transition={{ duration: 0.2 }}
     >
-      <span className="truncate">Invest Now</span>
+      <span className="truncate">Make an Offer</span>
     </motion.button>
   </motion.div>
 );
@@ -441,6 +498,22 @@ const GrowthIndicator = () => (
   </motion.div>
 );
 
+const NegotiateTab = ({ sme }) => {
+  const [offers, setOffers] = useState([]);
+
+  const handleSubmitOffer = (offer) => {
+    setOffers(prev => [...prev, offer]);
+  };
+
+  return (
+    <NegotiationTab 
+      sme={sme} 
+      offers={offers} 
+      onSubmitOffer={handleSubmitOffer}
+    />
+  );
+};
+
 const InvestmentModal = ({ sme, onClose, onConfirm }) => {
   const [amount, setAmount] = useState('');
 
@@ -460,8 +533,11 @@ const InvestmentModal = ({ sme, onClose, onConfirm }) => {
         onClick={(e) => e.stopPropagation()}
       >
         <h3 className="text-xl font-bold text-pulse-dark dark:text-white mb-4">
-          Invest in {sme.name}
+          Quick Offer for {sme.name}
         </h3>
+        <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">
+          Submit a quick offer or go to the Negotiate tab for detailed terms.
+        </p>
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -491,7 +567,7 @@ const InvestmentModal = ({ sme, onClose, onConfirm }) => {
               whileHover={{ scale: amount ? 1.02 : 1 }}
               whileTap={{ scale: amount ? 0.98 : 1 }}
             >
-              Confirm Investment
+              Submit Quick Offer
             </motion.button>
           </div>
         </div>

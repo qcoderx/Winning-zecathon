@@ -2,10 +2,52 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 
 const BusinessTypeCheck = ({ data, onComplete, onBack, canGoBack }) => {
-  const [isSaaS, setIsSaaS] = useState(data.isSaaS || false);
+  const [businessType, setBusinessType] = useState('');
+  const [error, setError] = useState('');
+
+  const businessTypes = [
+    {
+      id: 'physical',
+      title: 'Physical Business',
+      description: 'Retail store, restaurant, manufacturing, etc.',
+      icon: 'storefront',
+      requiresVideo: true
+    },
+    {
+      id: 'service',
+      title: 'Service Business',
+      description: 'Consulting, repair services, professional services',
+      icon: 'handyman',
+      requiresVideo: true
+    },
+    {
+      id: 'saas',
+      title: 'Software/SaaS',
+      description: 'Software development, digital products, apps',
+      icon: 'computer',
+      requiresVideo: false
+    },
+    {
+      id: 'ecommerce',
+      title: 'E-commerce',
+      description: 'Online retail, dropshipping, digital marketplace',
+      icon: 'shopping_cart',
+      requiresVideo: true
+    }
+  ];
 
   const handleContinue = () => {
-    onComplete({ isSaaS });
+    if (!businessType) {
+      setError('Please select your business type to continue.');
+      return;
+    }
+
+    const selectedType = businessTypes.find(type => type.id === businessType);
+    onComplete({ 
+      businessType,
+      isSaaS: businessType === 'saas',
+      requiresVideo: selectedType?.requiresVideo || true
+    });
   };
 
   return (
@@ -15,106 +57,93 @@ const BusinessTypeCheck = ({ data, onComplete, onBack, canGoBack }) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <div className="mb-8">
+      <div className="mb-6">
         <h2 className="text-2xl font-bold text-pulse-navy dark:text-white mb-2">
-          Business Type Classification
+          What type of business do you operate?
         </h2>
         <p className="text-gray-600 dark:text-gray-400">
-          Help us understand your business model to customize the verification process
+          This helps us customize the verification process for your business model
         </p>
       </div>
 
-      <div className="space-y-6">
-        <div className="text-center">
-          <h3 className="text-lg font-semibold text-pulse-navy dark:text-white mb-4">
-            Is your business a Software as a Service (SaaS) company?
-          </h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
-            <motion.button
-              type="button"
-              onClick={() => setIsSaaS(false)}
-              className={`p-6 rounded-xl border-2 transition-all ${
-                !isSaaS
-                  ? 'border-pulse-cyan bg-pulse-cyan/10 text-pulse-navy dark:text-white'
-                  : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
-              }`}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <div className="flex flex-col items-center gap-3">
-                <span className="material-symbols-outlined text-3xl">
-                  storefront
-                </span>
-                <div>
-                  <h4 className="font-semibold">Physical/Traditional Business</h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                    Retail, manufacturing, services with physical presence
-                  </p>
-                </div>
-              </div>
-            </motion.button>
-
-            <motion.button
-              type="button"
-              onClick={() => setIsSaaS(true)}
-              className={`p-6 rounded-xl border-2 transition-all ${
-                isSaaS
-                  ? 'border-pulse-cyan bg-pulse-cyan/10 text-pulse-navy dark:text-white'
-                  : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
-              }`}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <div className="flex flex-col items-center gap-3">
-                <span className="material-symbols-outlined text-3xl">
-                  cloud
-                </span>
-                <div>
-                  <h4 className="font-semibold">SaaS Business</h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                    Software, digital services, online platforms
-                  </p>
-                </div>
-              </div>
-            </motion.button>
-          </div>
-        </div>
-
-        {isSaaS && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4"
+      <div className="space-y-4 mb-6">
+        {businessTypes.map((type) => (
+          <motion.button
+            key={type.id}
+            onClick={() => {
+              setBusinessType(type.id);
+              setError('');
+            }}
+            className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
+              businessType === type.id
+                ? 'border-pulse-cyan bg-pulse-cyan/10'
+                : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+            }`}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
           >
-            <div className="flex items-start gap-3">
-              <span className="material-symbols-outlined text-blue-600 mt-0.5">info</span>
-              <div className="text-sm text-blue-800 dark:text-blue-200">
-                <p className="font-medium mb-1">SaaS Business Detected</p>
-                <p>Since you're a SaaS business, we'll skip the video recording step and focus on your digital presence and financial data for verification.</p>
+            <div className="flex items-center gap-4">
+              <div className={`p-3 rounded-lg ${
+                businessType === type.id 
+                  ? 'bg-pulse-cyan text-white' 
+                  : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
+              }`}>
+                <span className="material-symbols-outlined text-xl">{type.icon}</span>
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-pulse-navy dark:text-white mb-1">
+                  {type.title}
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  {type.description}
+                </p>
+                {!type.requiresVideo && (
+                  <div className="flex items-center gap-1 mt-2">
+                    <span className="material-symbols-outlined text-green-600 text-sm">check_circle</span>
+                    <span className="text-xs text-green-600 font-medium">Video recording optional</span>
+                  </div>
+                )}
               </div>
             </div>
-          </motion.div>
-        )}
-
-        {!isSaaS && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4"
-          >
-            <div className="flex items-start gap-3">
-              <span className="material-symbols-outlined text-green-600 mt-0.5">videocam</span>
-              <div className="text-sm text-green-800 dark:text-green-200">
-                <p className="font-medium mb-1">Video Verification Required</p>
-                <p>Next, you'll record a short video of your business location and operations to help verify your physical presence.</p>
-              </div>
-            </div>
-          </motion.div>
-        )}
+          </motion.button>
+        ))}
       </div>
 
-      <div className="flex justify-between pt-8">
+      {businessType && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6"
+        >
+          <div className="flex items-start gap-3">
+            <span className="material-symbols-outlined text-blue-600 mt-0.5">info</span>
+            <div className="text-sm text-blue-800 dark:text-blue-200">
+              <p className="font-medium mb-1">Next Steps</p>
+              <p>
+                {businessType === 'saas' 
+                  ? 'As a software business, you can skip the video recording step and proceed directly to bank connection.'
+                  : 'You\'ll need to record a short video showing your business operations and location.'
+                }
+              </p>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {error && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6"
+        >
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-red-600">error</span>
+            <p className="text-red-800 dark:text-red-200">{error}</p>
+          </div>
+        </motion.div>
+      )}
+
+      <div className="flex justify-between pt-6">
         {canGoBack && (
           <motion.button
             type="button"

@@ -9,9 +9,11 @@ import Opportunities from './components/Opportunities';
 import Footer from './components/Footer';
 import LoadingScreen from './components/LoadingScreen';
 import UserTypeSelector from './components/UserTypeSelector';
+import AppNavigation from './components/AppNavigation';
 import { AuthPage } from './auth';
 import { MarketplacePage, SMEProfilePage } from './marketplace';
 import SMEApp from './SMEApp';
+import LenderApp from './LenderApp';
 import { LoadingProvider } from './contexts/LoadingContext';
 import './App.css';
 
@@ -54,8 +56,12 @@ const UserTypePage = () => {
 const AuthPageWrapper = () => {
   const navigate = useNavigate();
 
-  const handleLoginSuccess = () => {
-    navigate('/marketplace');
+  const handleLoginSuccess = (userType) => {
+    if (userType === 'sme') {
+      navigate('/sme/dashboard');
+    } else {
+      navigate('/lender/dashboard');
+    }
   };
 
   window.onLoginSuccess = handleLoginSuccess;
@@ -92,6 +98,7 @@ function App() {
               <Route path="/marketplace" element={<MarketplacePage />} />
               <Route path="/marketplace/profile/:id" element={<SMEProfilePage />} />
               <Route path="/sme/*" element={<SMEApp />} />
+              <Route path="/lender/*" element={<LenderApp />} />
             </Routes>
           </Router>
         )}

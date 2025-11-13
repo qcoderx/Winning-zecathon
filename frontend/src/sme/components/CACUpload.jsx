@@ -1,8 +1,38 @@
 import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { verifyCompany } from 'cac-verify';
-
 const CACUpload = ({ data, onComplete, onBack, canGoBack }) => {
+  // CAC verification will be handled by backend API
+  const verifyCompany = async (rcNumber) => {
+    try {
+      const response = await fetch('/api/sme/verify-cac', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ rcNumber: rcNumber.trim() })
+      });
+      
+      const result = await response.json();
+      
+      if (response.ok && result.success) {
+        return {
+          data: result.data,
+          error: null
+        };
+      } else {
+        return {
+          data: null,
+          error: result.message || 'Verification failed'
+        };
+      }
+    } catch (error) {
+      return {
+        data: null,
+        error: `Network error: ${error.message}`
+      };
+    }
+  };
   const [hasCAC, setHasCAC] = useState(null);
   const [file, setFile] = useState(null);
   const [rcNumber, setRcNumber] = useState('');
@@ -38,9 +68,15 @@ const CACUpload = ({ data, onComplete, onBack, canGoBack }) => {
 
     setIsVerifying(true);
     setErrors({});
+    console.log('Starting CAC verification for:', rcNumber.trim());
 
     try {
-      const { data: cacData, error } = await verifyCompany(rcNumber.trim());
+      console.log('Calling verifyCompany with RC:', rcNumber.trim());
+      
+      // Call CAC verify API - returns { data, error }
+      const { data, error } = await verifyCompany(rcNumber.trim());
+      
+      console.log('CAC API Response - Data:', data, 'Error:', error);
       
       if (error) {
         setVerificationResult({
@@ -48,17 +84,24 @@ const CACUpload = ({ data, onComplete, onBack, canGoBack }) => {
           message: error,
           data: null
         });
-      } else {
+      } else if (data) {
         setVerificationResult({
           success: true,
           message: 'CAC verification successful',
-          data: cacData
+          data: data
+        });
+      } else {
+        setVerificationResult({
+          success: false,
+          message: 'No company found with this RC number',
+          data: null
         });
       }
     } catch (err) {
+      console.error('CAC Exception:', err);
       setVerificationResult({
         success: false,
-        message: 'Verification failed. Please check your RC number and try again.',
+        message: `Network error: ${err.message}`,
         data: null
       });
     } finally {
@@ -231,12 +274,15 @@ const CACUpload = ({ data, onComplete, onBack, canGoBack }) => {
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             RC Number (Optional - for verification)
           </label>
+          <div className="text-xs text-gray-500 mb-2">
+            Enter a valid Nigerian RC number (e.g., RC123456) - Backend will verify with CAC database
+          </div>
           <div className="flex gap-3">
             <input
               type="text"
               value={rcNumber}
               onChange={(e) => {
-                setRcNumber(e.target.value);
+                setRcNumber(e.target.value.toUpperCase());
                 setErrors(prev => ({ ...prev, rcNumber: '' }));
                 setVerificationResult(null);
               }}
@@ -245,7 +291,7 @@ const CACUpload = ({ data, onComplete, onBack, canGoBack }) => {
                   ? 'border-red-300 bg-red-50 dark:bg-red-900/20' 
                   : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700'
               }`}
-              placeholder="Enter RC number (e.g. RC123456)"
+              placeholder="Enter RC number (e.g. RC1234567)"
             />
             <motion.button
               type="button"
@@ -288,9 +334,11 @@ const CACUpload = ({ data, onComplete, onBack, canGoBack }) => {
             </div>
             {verificationResult.success && verificationResult.data && (
               <div className="mt-3 text-sm text-green-700 dark:text-green-300">
+                <p><strong>RC Number:</strong> {verificationResult.data.rcNumber}</p>
                 <p><strong>Company:</strong> {verificationResult.data.name}</p>
                 <p><strong>Registration Date:</strong> {verificationResult.data.dateOfRegistration}</p>
                 <p><strong>Address:</strong> {verificationResult.data.address}</p>
+                <p><strong>Registration Status:</strong> {verificationResult.data.isRegistrationComplete ? 'Complete' : 'Incomplete'}</p>
               </div>
             )}
           </motion.div>

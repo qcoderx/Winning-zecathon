@@ -65,13 +65,13 @@ const OnboardingWizard = ({ onComplete }) => {
 
   return (
     <motion.div 
-      className="min-h-screen bg-pulse-light dark:bg-pulse-dark"
+      className="min-h-full bg-pulse-light dark:bg-pulse-dark"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.6 }}
     >
       <motion.div 
-        className="max-w-4xl mx-auto px-4 py-8"
+        className="max-w-4xl mx-auto px-4 py-4"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, delay: 0.2 }}

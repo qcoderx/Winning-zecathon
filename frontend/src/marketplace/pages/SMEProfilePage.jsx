@@ -270,19 +270,19 @@ const OverviewTab = ({ sme }) => (
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <div className="text-center p-4 bg-white dark:bg-pulse-navy rounded-xl shadow-sm">
-          <div className="text-3xl font-bold text-pulse-cyan mb-2">₦{(sme.loanAmount || 2500000).toLocaleString()}</div>
-          <div className="text-sm text-gray-500">Funding Required</div>
+          <div className="text-3xl font-bold text-pulse-cyan mb-2">₦{(sme.loanApplication?.loanAmount || 2500000).toLocaleString()}</div>
+          <div className="text-sm text-gray-500">Loan Amount Requested</div>
         </div>
         <div className="text-center p-4 bg-white dark:bg-pulse-navy rounded-xl shadow-sm">
-          <div className="text-3xl font-bold text-pulse-pink mb-2">{sme.interestRate || 15}%</div>
-          <div className="text-sm text-gray-500">Interest Rate</div>
+          <div className="text-3xl font-bold text-pulse-pink mb-2">{sme.loanApplication?.interestRate || 15}%</div>
+          <div className="text-sm text-gray-500">Asking Interest Rate</div>
         </div>
         <div className="text-center p-4 bg-white dark:bg-pulse-navy rounded-xl shadow-sm">
-          <div className="text-3xl font-bold text-green-500 mb-2">24</div>
-          <div className="text-sm text-gray-500">Months Tenure</div>
+          <div className="text-3xl font-bold text-green-500 mb-2">{sme.loanApplication?.tenureMonths || 24}</div>
+          <div className="text-sm text-gray-500">Tenure (Months)</div>
         </div>
         <div className="text-center p-4 bg-white dark:bg-pulse-navy rounded-xl shadow-sm">
-          <div className="text-3xl font-bold text-blue-500 mb-2">18-24%</div>
+          <div className="text-3xl font-bold text-blue-500 mb-2">{Math.round((sme.loanApplication?.interestRate || 15) * 1.2)}-{Math.round((sme.loanApplication?.interestRate || 15) * 1.4)}%</div>
           <div className="text-sm text-gray-500">Expected ROI</div>
         </div>
       </div>
@@ -319,7 +319,7 @@ const OverviewTab = ({ sme }) => (
           <div>
             <h4 className="font-semibold text-gray-700 dark:text-gray-300 mb-3">Funding Purpose</h4>
             <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-              Expansion of operations, inventory procurement, and working capital to meet growing demand in the {sme.industry} sector.
+              {sme.loanApplication?.purpose || `Expansion of operations, inventory procurement, and working capital to meet growing demand in the ${sme.industry} sector.`}
             </p>
           </div>
         </div>

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import AppNavigation from '../../components/AppNavigation';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
 import StatsCards from '../components/StatsCards';
@@ -54,6 +55,7 @@ const MarketplacePage = () => {
 
   return (
     <div className="relative flex h-auto min-h-screen w-full flex-col font-display bg-pulse-neutral-light dark:bg-pulse-dark text-pulse-dark dark:text-pulse-light">
+      <AppNavigation userType="lender" />
       <Header onSearch={handleSearch} />
       
       <div className="flex flex-1">

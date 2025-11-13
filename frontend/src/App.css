@@ -24,17 +24,107 @@ body {
 }
 
 .pulse-heartbeat {
-  stroke-dasharray: 1000;
-  stroke-dashoffset: 1000;
-  animation: draw 8s linear infinite;
+  stroke-dasharray: 2000;
+  stroke-dashoffset: 2000;
+  animation: draw 6s ease-in-out infinite;
+  filter: drop-shadow(0 0 8px rgba(0, 196, 180, 0.6));
+}
+
+.pulse-heartbeat-2 {
+  stroke-dasharray: 1500;
+  stroke-dashoffset: 1500;
+  animation: draw-reverse 8s ease-in-out infinite;
+  filter: drop-shadow(0 0 6px rgba(255, 107, 157, 0.5));
 }
 
 @keyframes draw {
-  to {
+  0% {
+    stroke-dashoffset: 2000;
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
     stroke-dashoffset: 0;
+    opacity: 0;
+  }
+}
+
+@keyframes draw-reverse {
+  0% {
+    stroke-dashoffset: -1500;
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0;
   }
 }
 
 .invest-button-gradient {
   background-image: linear-gradient(to right, var(--pulse-cyan), var(--pulse-pink));
+}
+
+.bg-gradient-radial {
+  background: radial-gradient(circle at center, var(--tw-gradient-stops));
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+.pulse-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+.float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes heartbeat {
+  0%, 100% {
+    transform: scale(1);
+  }
+  14% {
+    transform: scale(1.1);
+  }
+  28% {
+    transform: scale(1);
+  }
+  42% {
+    transform: scale(1.1);
+  }
+  70% {
+    transform: scale(1);
+  }
+}
+
+.heartbeat {
+  animation: heartbeat 2s ease-in-out infinite;
 }

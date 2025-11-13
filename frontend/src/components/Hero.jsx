@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 
 const Hero = ({ onAuthClick }) => {
   return (
-    <section className="relative py-24 sm:py-32 bg-pulse-navy">
+    <section className="relative py-24 sm:py-32 bg-pulse-navy overflow-hidden">
       <motion.div 
         className="absolute inset-0 bg-cover bg-center opacity-30" 
         style={{backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuBm1JEjgdQV-sEuCBLuGu6moJAeBPd0Kuqa7xBh_n1wSgt1hXLZrw6rCevXanwicJNgb0bEiXwWHSeMD78-q9mcjkfozmc_WX6dB8g_LgaFZFKViI8u205_osoS8DKWlozcxn_1RfUjt7Ue-KoUALAaKsCg8iit9jWDtYX7wYJfTPul3xoBR6I-OFYknE2Dfq1_vdRLsZKBTzQUwudwS8ASBdyIeoHds3L_R3FV_o0lCp8YxAxoy4yWm2cyXxqaSxxSZUZepeW5aQw')"}} 
@@ -10,37 +10,126 @@ const Hero = ({ onAuthClick }) => {
         animate={{ scale: 1, opacity: 0.3 }}
         transition={{ duration: 1.5, ease: "easeOut" }}
       />
-      <motion.div 
-        className="absolute inset-0 opacity-20"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 0.2 }}
-        transition={{ delay: 0.5, duration: 1 }}
-      >
-        <svg className="w-full h-full" preserveAspectRatio="xMidYMid slice" viewBox="0 0 1440 560" xmlns="http://www.w3.org/2000/svg">
-          <motion.path 
-            className="pulse-heartbeat" 
-            d="M0 280 L200 280 L240 220 L280 340 L320 180 L360 280 L1440 280" 
-            fill="none" 
-            stroke="url(#line-gradient)" 
-            strokeWidth="2"
-            initial={{ pathLength: 0 }}
-            animate={{ pathLength: 1 }}
-            transition={{ 
-              duration: 2, 
-              delay: 1,
+      {/* Animated Pulse Background */}
+      <div className="absolute inset-0 overflow-hidden">
+        {/* Moving Pulse Circles */}
+        {[...Array(6)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute rounded-full border border-pulse-cyan/20"
+            style={{
+              width: `${200 + i * 100}px`,
+              height: `${200 + i * 100}px`,
+              left: `${20 + i * 15}%`,
+              top: `${10 + i * 10}%`,
+            }}
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.1, 0.3, 0.1],
+              x: [0, 50, 0],
+              y: [0, -30, 0],
+            }}
+            transition={{
+              duration: 4 + i * 0.5,
               repeat: Infinity,
-              repeatType: "loop",
-              ease: "easeInOut" 
+              delay: i * 0.3,
+              ease: "easeInOut"
             }}
           />
-          <defs>
-            <linearGradient id="line-gradient" x1="0%" x2="100%" y1="0%" y2="0%">
-              <stop offset="0%" style={{stopColor: "var(--pulse-cyan)"}} />
-              <stop offset="100%" style={{stopColor: "var(--pulse-pink)"}} />
-            </linearGradient>
-          </defs>
-        </svg>
-      </motion.div>
+        ))}
+        
+        {/* Floating Pulse Dots */}
+        {[...Array(12)].map((_, i) => (
+          <motion.div
+            key={`dot-${i}`}
+            className="absolute w-2 h-2 bg-pulse-cyan/40 rounded-full"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+            }}
+            animate={{
+              y: [0, -100, 0],
+              opacity: [0, 1, 0],
+              scale: [0.5, 1, 0.5],
+            }}
+            transition={{
+              duration: 3 + Math.random() * 2,
+              repeat: Infinity,
+              delay: Math.random() * 2,
+              ease: "easeInOut"
+            }}
+          />
+        ))}
+        
+        {/* Heartbeat Line */}
+        <motion.div 
+          className="absolute inset-0 opacity-20"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.2 }}
+          transition={{ delay: 0.5, duration: 1 }}
+        >
+          <svg className="w-full h-full" preserveAspectRatio="xMidYMid slice" viewBox="0 0 1440 560" xmlns="http://www.w3.org/2000/svg">
+            <motion.path 
+              className="pulse-heartbeat" 
+              d="M0 280 L200 280 L240 220 L280 340 L320 180 L360 280 L600 280 L640 240 L680 320 L720 200 L760 280 L1000 280 L1040 260 L1080 300 L1120 240 L1160 280 L1440 280" 
+              fill="none" 
+              stroke="url(#line-gradient)" 
+              strokeWidth="3"
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              transition={{ 
+                duration: 3, 
+                delay: 1,
+                repeat: Infinity,
+                repeatType: "loop",
+                ease: "easeInOut" 
+              }}
+            />
+            <motion.path 
+              className="pulse-heartbeat-2" 
+              d="M0 320 L150 320 L190 280 L230 360 L270 260 L310 320 L550 320 L590 300 L630 340 L670 280 L710 320 L950 320 L990 300 L1030 340 L1070 300 L1110 320 L1440 320" 
+              fill="none" 
+              stroke="url(#line-gradient-2)" 
+              strokeWidth="2"
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              transition={{ 
+                duration: 4, 
+                delay: 2,
+                repeat: Infinity,
+                repeatType: "loop",
+                ease: "easeInOut" 
+              }}
+            />
+            <defs>
+              <linearGradient id="line-gradient" x1="0%" x2="100%" y1="0%" y2="0%">
+                <stop offset="0%" style={{stopColor: "#00C4B4", stopOpacity: 0.8}} />
+                <stop offset="50%" style={{stopColor: "#FF6B9D", stopOpacity: 1}} />
+                <stop offset="100%" style={{stopColor: "#00C4B4", stopOpacity: 0.8}} />
+              </linearGradient>
+              <linearGradient id="line-gradient-2" x1="0%" x2="100%" y1="0%" y2="0%">
+                <stop offset="0%" style={{stopColor: "#FF6B9D", stopOpacity: 0.6}} />
+                <stop offset="50%" style={{stopColor: "#00C4B4", stopOpacity: 0.8}} />
+                <stop offset="100%" style={{stopColor: "#FF6B9D", stopOpacity: 0.6}} />
+              </linearGradient>
+            </defs>
+          </svg>
+        </motion.div>
+        
+        {/* Pulsing Gradient Overlay */}
+        <motion.div
+          className="absolute inset-0 bg-gradient-radial from-pulse-cyan/10 via-transparent to-pulse-pink/10"
+          animate={{
+            opacity: [0.3, 0.6, 0.3],
+            scale: [1, 1.1, 1],
+          }}
+          transition={{
+            duration: 6,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+      </div>
       <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10">
         <motion.div 
           className="flex flex-col gap-4"

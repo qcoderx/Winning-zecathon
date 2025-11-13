@@ -69,9 +69,17 @@ const NegotiationTab = ({ sme, offers = [], onSubmitOffer }) => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <h3 className="text-lg font-bold text-pulse-dark dark:text-white mb-6">
-          Submit Investment Offer
-        </h3>
+        <div className="flex items-center gap-3 mb-6">
+          <span className="material-symbols-outlined text-pulse-cyan text-2xl">gavel</span>
+          <div>
+            <h3 className="text-lg font-bold text-pulse-dark dark:text-white">
+              Submit Formal Investment Proposal
+            </h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Professional term sheet - This will be sent directly to the SME for review
+            </p>
+          </div>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           {/* Interest Rate */}
@@ -166,10 +174,13 @@ const NegotiationTab = ({ sme, offers = [], onSubmitOffer }) => {
           {isSubmitting ? (
             <div className="flex items-center justify-center gap-2">
               <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              Submitting Offer...
+              Submitting Term Sheet...
             </div>
           ) : (
-            'Submit Investment Offer'
+            <div className="flex items-center justify-center gap-2">
+              <span className="material-symbols-outlined">send</span>
+              Submit Investment Proposal
+            </div>
           )}
         </motion.button>
       </motion.div>
@@ -209,9 +220,17 @@ const NegotiationTab = ({ sme, offers = [], onSubmitOffer }) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <h3 className="text-lg font-bold text-pulse-dark dark:text-white mb-6">
-            Negotiation History
-          </h3>
+          <div className="flex items-center gap-3 mb-6">
+            <span className="material-symbols-outlined text-pulse-pink text-2xl">history</span>
+            <div>
+              <h3 className="text-lg font-bold text-pulse-dark dark:text-white">
+                Investment Proposals & Negotiations
+              </h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Formal term sheets and counteroffers
+              </p>
+            </div>
+          </div>
 
           <div className="space-y-4">
             {offers.map((offer, index) => (
@@ -224,17 +243,17 @@ const NegotiationTab = ({ sme, offers = [], onSubmitOffer }) => {
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-pulse-cyan/20 rounded-full flex items-center justify-center">
-                      <span className="material-symbols-outlined text-pulse-cyan text-sm">
-                        person
+                    <div className="w-10 h-10 bg-pulse-cyan/20 rounded-full flex items-center justify-center">
+                      <span className="material-symbols-outlined text-pulse-cyan">
+                        account_balance
                       </span>
                     </div>
                     <div>
-                      <p className="font-medium text-pulse-dark dark:text-white">
-                        {offer.investorName}
+                      <p className="font-bold text-pulse-dark dark:text-white">
+                        {offer.investorName} - Investment Proposal
                       </p>
                       <p className="text-xs text-gray-500">
-                        {new Date(offer.timestamp).toLocaleDateString()} at{' '}
+                        Submitted {new Date(offer.timestamp).toLocaleDateString()} at{' '}
                         {new Date(offer.timestamp).toLocaleTimeString()}
                       </p>
                     </div>
